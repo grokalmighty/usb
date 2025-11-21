@@ -140,4 +140,11 @@ class UnifiedSearch {
         this.selectedIndex = (this.selectedIndex + direction + filteredResults.length) % filteredResults.length;
         this.updateSelection();
     }
+
+    updateSelection() {
+        const items = this.resultsList.querySelectorAll('.result-item');
+        items.forEach((item, index) => {
+            item.classList.toggle('selected', index === this.selectedIndex);
+        });
+    }
 }
