@@ -44,3 +44,12 @@ function registerGlobalHotKey() {
         console.log('Global hotkey registration failed');
     }
 }
+
+app.whenReady().then(() => {
+    createWindow();
+    registerGlobalHotKey();
+
+    app.on('acivate', function () {
+        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+});
