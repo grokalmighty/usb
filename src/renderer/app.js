@@ -176,4 +176,12 @@ class UnifiedSearch {
             console.error('Error executing result:', error);
         }
     }
+
+    setActiveFilter(filter) {
+        this.activeFilter = filter;
+        this.typeButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.type === filter);
+        });
+        this.displayResults();
+    }
 }
