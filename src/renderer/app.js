@@ -192,4 +192,12 @@ class UnifiedSearch {
             </div>
         `;
     }
+
+    showNoResults() {
+        this.resultsList.innerHTML = `
+            <div class="empty-state">
+                <p>No results found</p>
+            </div>
+        `;
+    }
 }
