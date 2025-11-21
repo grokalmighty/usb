@@ -18,4 +18,11 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js')
         }
     });
+
+    mainWindow.loadFile(path.join(__dirname, 'renderer/index.html'));
+
+    // Hide window when blurred
+    mainWindow.on('blur', () => {
+        if (!isDev) mainWindow.hide();
+    });
 }
