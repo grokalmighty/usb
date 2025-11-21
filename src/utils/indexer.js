@@ -87,4 +87,31 @@ class FileIndexer {
             this.isIndexing = false;
         }
     }
+
+    async _indexDirectoryRecurisve(currentDir, depth, options) {
+        if (depth > options.maxDepth) return;
+
+        try {
+            const items = await fs.readdir(currentDir, { withFileTypes: true});
+
+            for (const item of items) {
+                const fullPath = path.join(currentDir, item.name);
+
+                // Skip excluded directories
+                if (item.isDirectory()) {
+                    if (this._shouldSkipDirectory(item.name, options.excludePatterns)) {
+                        continue;
+                    }
+                    await this._indexDirectoryRecursive(fullPath, depth + 1, options);
+                } else if (item.isFile()) {
+                    await this._indexFile(fullPath, options);
+                }
+            }
+        } catch (error) {
+            // Skip directories we can't access
+            if (error.code !== 'EACCES' && error.code !== 'EPERM') {
+                console.log(`Skipping directory ${currentDir}: ${error.message}`);
+            }
+        }
+    }
 }
