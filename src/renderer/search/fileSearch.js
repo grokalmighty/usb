@@ -44,4 +44,9 @@ class FileSearch {
             // Skip directories we can't access
         }
     }
+
+    shouldSkipDirectory(dirName) {
+        const SkipDirs = ['node_modules', '.git', '.vscode', 'Library'];
+        return SkipDirs.includes(dirName);
+    }
 }
