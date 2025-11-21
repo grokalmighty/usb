@@ -64,4 +64,26 @@ class FileSearch {
         };
         return typeMap[extension] || 'File';
     }
+
+    async search(query) {
+        if (!query || this.index.length === 0) return [];
+
+        const lowercaseQuery = query.toLowerCase();
+        const results = this.index
+            .filter(file =>
+                file.name.toLowerCase().includes(lowercaseQuery) ||
+                file.path.toLowerCase().includes(lowercaseQuery)
+            )
+            .slice(0, 20)
+            .map(file => ({
+                title: file.name,
+                subtitle: file.path,
+                path: file.path,
+                type: 'file',
+                icon: this.getFileIcon(file.name),
+                shortcut: 'Enter to open'
+            }));
+        
+        return results;
+    }
 }
