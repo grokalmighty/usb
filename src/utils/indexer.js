@@ -34,4 +34,21 @@ class FileIndexer {
         }
         return false;
     }
+
+    async saveIndex() {
+        try {
+            const indexData = {
+                version: this.indexVersion,
+                index: Array.from(this.index.entries()),
+                lastUpdated: new Date().toISOSring()
+            };
+
+            await fs.writeFile(this.indexPath, JSON.stringify(indexData, null, 2));
+            console.log(`Saved index with ${this.index.size} files`);
+            return true;
+        } catch (error) {
+            console.error('Failed to save index:', error);
+            return false; 
+        }
+    }
 }
