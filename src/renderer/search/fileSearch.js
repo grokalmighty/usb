@@ -49,4 +49,19 @@ class FileSearch {
         const SkipDirs = ['node_modules', '.git', '.vscode', 'Library'];
         return SkipDirs.includes(dirName);
     }
+
+    getFileType(fileName) {
+        const extension = fileName.split('.').pop().toLowerCase();
+        const typeMap = {
+            'js': 'JavaScript',
+            'html': 'HTML',
+            'css': 'CSS',
+            'md': 'Markdown',
+            'txt': 'Text',
+            'pdf': 'PDF',
+            'doc': 'Word',
+            'docx': 'Word'
+        };
+        return typeMap[extension] || 'File';
+    }
 }
