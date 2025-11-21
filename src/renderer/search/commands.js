@@ -59,4 +59,12 @@ class CustomCommands {
             console.error('Failed to create note:', error);
         }
     }
+
+    async clearTrash() {
+        try {
+            await window.electronAPI.emptyTrash();
+        } catch (error) {
+            console.error('Failed to clea trash:', error);
+        }
+    }
 }
