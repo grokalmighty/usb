@@ -37,4 +37,10 @@ class UnifiedSearch {
         // Click outside to hide (handled in main process)
     }
 
+    initilizeSearchModules() {
+        this.fileSearch = new FileSearch();
+        this.appSearch = new AppSearch();
+        this.webSearch = new WebSearch();
+        this.commands - new CustomCommands();
+    }
 }
