@@ -24,4 +24,25 @@ class CustomCommands {
             }
         ];
     }
+
+    async search(query) {
+        if (!query) return [];
+
+        const lowercaseQuery = query.toLowerCase();
+        const results = this.commands
+            .filter(cmd =>
+                    cmd.title.toLowerCase().includes(lowercaseQuery) ||
+                    cmd.description.toLowerCase().includes(lowercaseQuery)
+            )
+            .map(cmd => ({
+                title: cmd.title,
+                subtitle: cmd.description,
+                type: 'command',
+                icon: cmd.icon,
+                execute: cmd.execute,
+                shortcut: 'Enter to execute'
+            }));
+        
+        return results;
+    }
 }
