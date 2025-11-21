@@ -45,4 +45,18 @@ class CustomCommands {
         
         return results;
     }
+
+    async createNote() {
+        const timestamp = new Date().toISOString().split('T')[0];
+        const noteContent = `# New Note - ${timestamp}\n\nCreated via Unified Search Bar\n`;
+
+        try {
+            const downloadsPath = await window.electronAPI.getDownloadsPath();
+            const notePath = `${downloadsPath}/note-${timestamp}.md`;
+            await window.electronAPI.writeFile(notePath, noteContent);
+            await window.electronAPI.openFile(notePath);
+        } catch (error) {
+            console.error('Failed to create note:', error);
+        }
+    }
 }
