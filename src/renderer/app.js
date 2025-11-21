@@ -147,4 +147,11 @@ class UnifiedSearch {
             item.classList.toggle('selected', index === this.selectedIndex);
         });
     }
+
+    executeSelectedResult() {
+        const filteredResults = this.filterResults(this.currentResults);
+        if (filteredResults[this.selectedIndex]) {
+            this.executeResult(filteredResults[this.selectedIndex]);
+        }
+    }
 }
