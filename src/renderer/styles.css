@@ -105,3 +105,9 @@ body {
     color: white;
     border-color: #007AFF;
 }
+
+.results-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+}
