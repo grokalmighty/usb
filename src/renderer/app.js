@@ -201,3 +201,8 @@ class UnifiedSearch {
         `;
     }
 }
+
+// Initialize the application when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new UnifiedSearch();
+});
