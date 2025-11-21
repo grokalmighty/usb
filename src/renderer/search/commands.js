@@ -67,4 +67,12 @@ class CustomCommands {
             console.error('Failed to clea trash:', error);
         }
     }
+
+    async takeScreenshot() {
+        try {
+            await window.electronAPI.takeScreenshot();
+        } catch (error) {
+            console.error('Failed to take screenshot:', error);
+        }
+    }
 }
