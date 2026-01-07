@@ -31,7 +31,7 @@ def discover_scripts() -> Dict[str, Script]:
         if not manifest.exists():
             continue
 
-        data = json.loads(manifest.read_text())
+        data = _load_manifest(manifest)
 
         s = Script(
             id=data["id"],
