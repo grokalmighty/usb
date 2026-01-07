@@ -38,3 +38,6 @@ def discover_scripts() -> Dict[str, Script]:
         scripts[s.id] = s
     
     return scripts
+
+def list_scripts() -> List[Script]:
+    return list(discover_scripts().values())
