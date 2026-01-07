@@ -1,10 +1,10 @@
 import time
-from typing import Dict
+from typing import Dict, Set
 
 from .registry import discover_scripts, Script
 from .runner import run_script
 
-def _next_due_times(scripts: Dict[str, Script]) -> Dict[str, float]:
+def _initial_next_due(scripts: Dict[str, Script]) -> Dict[str, float]:
     """
     For each enabled interval script, store the next time it should run
     """
@@ -32,7 +32,8 @@ def main(poll_interval: float = 0.5) -> None:
     print("Control Core daemon starting...(Ctrl+C to stop)")
 
     scripts = discover_scripts()
-    next_due = _next_due_times(scripts)
+    next_due = _initial_next_due(scripts)
+    running: Set[str] = set()
 
     while True:
         now = time.time()
@@ -52,9 +53,17 @@ def main(poll_interval: float = 0.5) -> None:
 
             due = next_due.get(script_id, now)
             if now >= due:
-                ok, run_id = run_script(s)
-                print(f"[{time.strftime('%H:%M:%S')}] ran {script_id} ok={ok} run_id={run_id}")
-                next_due[script_id] = now + seconds
+                if script_id in running:
+                    next_due[script_id] = now + 1.0
+                    continue
+                    
+                running.add(script_id)
+                try:
+                    ok, run_id = run_script(s, timeout_seconds=20.0)
+                    print(f"[{time.strftime('%H:%M:%S')}] ran {script_id} ok={ok} run_id{run_id}")
+                    next_due[script_id] = now + seconds
+                finally:
+                    running.remove(script_id)
         
         time.sleep(poll_interval)
 
