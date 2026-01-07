@@ -2,6 +2,6 @@
     "id": "watch_echo",
     "name": "Watch Echo",
     "enabled": true,
-    "schedule": {"type" :"file_watch", "Path": "data/watchme.txt", "poll_seconds": 1.0},
+    "schedule": {"type" :"file_watch", "path": "data/watchme.txt", "poll_seconds": 1.0},
     "entrypoint": "control_core.scripts.watch_echo.main:main"
 }

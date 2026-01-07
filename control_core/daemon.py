@@ -132,7 +132,7 @@ def main(poll_interval: float = 0.5) -> None:
 
                     if stype == "interval":
                         seconds = float(sched.get("seconds", 0))
-                        next_due=[sid] = now + seconds
+                        next_due[sid] = now + seconds
                 
                 finally:
                     running.remove(sid)
@@ -140,4 +140,7 @@ def main(poll_interval: float = 0.5) -> None:
         time.sleep(poll_interval)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nDameon stopped.")
