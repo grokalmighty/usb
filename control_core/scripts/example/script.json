@@ -1,0 +1,7 @@
+{
+    "id": "example",
+    "name": "Example Script",
+    "enabled": true,
+    "schedule": {"type": "interval", "seconds": 10},
+    "entrypoint": "control_core.scripts.example.main:main"
+}
