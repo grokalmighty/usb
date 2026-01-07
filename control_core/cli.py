@@ -1,8 +1,10 @@
 import sys
+import time
 
 from .registry import discover_scripts, list_scripts, update_manifest
 from .runner import run_script
 from .installer import install_script_from_folder
+from .logs import last_run_by_script, tail_follow
 
 def main(argv=None) -> int:
     argv = argv or sys.argv[1:]
@@ -86,6 +88,37 @@ def main(argv=None) -> int:
         force = "--force" in argv[2:]
         script_id = install_script_from_folder(folder, force=force)
         print(f"Installed {script_id}")
+        return 0
+
+    if cmd == "status":
+        scripts = discover_scripts()
+        last = last_run_by_script()
+
+        for sid in sorted(scripts.keys()):
+            s = scripts[sid]
+            status = "ENABLED" if s.enabled else "disabled"
+            e = last.get(sid)
+
+            if not e:
+                print(f"{sid:10} {status:8} last_run=never")
+                continue
+
+            ok = e.get("ok")
+            ended = e.get("ended_at", 0)
+            when = time.strftime("%H:%M:%S", time.localtime(ended)) if ended else "unknown"
+            print(f"{sid:10} {status:8} last_run={when} ok={ok}")
+        return 0
+
+    if cmd == "tail":
+        # Usage: tail [n]
+        n = 20
+        if len(argv) >= 2:
+            try:
+                n = int(argv[1])
+            except ValueError:
+                print("Usage: python -m control_core.cli tail [n]")
+                return 2
+        tail_follow(n=n)
         return 0
     
     print(f"Unknown command: {cmd}")
