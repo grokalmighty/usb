@@ -16,3 +16,8 @@ def _load_uncallable(entrypoint: str):
     module = importlib.import_module(module_path)
     fn = getattr(module, func_name)
     return fn
+
+def log_event(event: Dict[str, Any]) -> None:
+    LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with LOG_PATH.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(event, ensure_ascii=False) + "\n")
