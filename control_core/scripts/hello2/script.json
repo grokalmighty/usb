@@ -1,0 +1,7 @@
+{
+    "id": "hello2",
+    "name": "Hello2",
+    "enabled": true,
+    "schedule": {"type": "interval", "seconds": 5},
+    "entrypoint": "control_core.scripts.hello2.main:main"
+}
