@@ -3,5 +3,5 @@
     "name": "Hello2",
     "enabled": true,
     "schedule": {"type": "interval", "seconds": 5},
-    "entrypoint": "controle_core.scripts.hello2.main:main"
+    "entrypoint": "control_core.scripts.hello2.main:main"
 }
