@@ -1,7 +1,0 @@
-policies:
-  - policy_id: example_nightly
-    event:
-      type: TIME_TRIGGER
-      time: "16:00"
-    actions:
-      - run_script: example_script
