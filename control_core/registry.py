@@ -47,3 +47,17 @@ def discover_scripts() -> Dict[str, Script]:
 
 def list_scripts() -> List[Script]:
     return list(discover_scripts().values())
+
+def update_manifest(script_id: str, updater) -> None:
+    """
+    Updater: function that takes manifest dict and mutates it.
+    """
+
+    script_dir = SCRIPTS_DIR / script_id
+    manifest_path = script_dir / "script.json"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"script.json not found for id={script_id}")
+    
+    data = _load_manifest(manifest_path)
+    updater(data)
+    _save_manifest(manifest_path, data)
