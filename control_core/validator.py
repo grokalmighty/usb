@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-def validate_script_foldeR(folder: str) -> tuple[bool, list[str]]:
+def validate_script_folder(folder: str) -> tuple[bool, list[str]]:
     errs: list[str] = []
     src = Path(folder).expanduser().resolve()
 
@@ -20,7 +20,7 @@ def validate_script_foldeR(folder: str) -> tuple[bool, list[str]]:
 
     # Required fields
     for k in ["id", "entrypoint"]:
-        if k not in data or not str(data[k]).sstrip():
+        if k not in data or not str(data[k]).strip():
             errs.append(f"Missing required field: {k}")
 
     script_id = data.get("id")
