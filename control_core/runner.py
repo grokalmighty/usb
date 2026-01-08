@@ -53,6 +53,7 @@ def run_script(script: Script, timeout_seconds: Optional[float] = 30.0, payload:
             timeout=timeout_seconds,
             env={**os.environ, "CONTROL_CORE_PAYLOAD": payload_json},
         )
+        error = proc.stderr if proc.returncode != 0 else ""
         ended = time.time()
 
         ok = proc.returncode == 0
@@ -64,6 +65,7 @@ def run_script(script: Script, timeout_seconds: Optional[float] = 30.0, payload:
                 "exit_code": proc.returncode,
                 "stdout": proc.stdout,
                 "stderr": proc.stderr,
+                'error': error,
                 "timeout_seconds": timeout_seconds,
             }
         )

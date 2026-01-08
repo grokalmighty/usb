@@ -3,24 +3,21 @@ from pathlib import Path
 def main(payload=None):
     payload = payload or {}
     failed = payload.get("failed_event", {})
-    sid = failed.get("script_id", "?")
-    run_id = failed.get("run_id", "?")
-    stderr = failed.get("stderr", "")
-    stdout = failed.get("stdout", "")
-    error = failed.get("error", "")
 
     print("ALERT: Script failure")
-    print(f"script_id: {sid}")
-    print(f"run_id: {run_id}")
+    print(f"script_id: {failed.get('script_id')}")
+    print(f"run_id: {failed.get('run_id')}")
 
-    if error:
-        print("\nTraceback/error:")
-        print(error.strip())
+    err = failed.get("error") or ""
+    stderr = failed.get("stderr") or ""
+    stdout = failed.get("stdout") or ""
 
-    if stderr:
-        print("\nstderr:")
-        print(stderr.strip())
+    tb = err if err else stderr
 
-    if stdout:
-        print("\nstdout:")
-        print(stdout.strip())    
+    if tb:
+        print("\ntraceback:")
+        print(tb.strip())
+    
+    if stdout and stdout.strip():
+        print("\nfailed stdout:")
+        print(stdout.strip()) 

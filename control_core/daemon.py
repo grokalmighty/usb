@@ -114,7 +114,7 @@ def main(poll_interval: float = 0.5) -> None:
                     running.add(sid)
                     try:
                         ok, run_id = run_script(s, timeout_seconds=20.0, payload={"failed_event": event})
-                        print(f"[{time.strftime('%H:%M:%S')}] on failure -> ran {sid} ok={ok} run_id={run_id} (failure from {failed_script_id})")
+                        print(f"[{time.strftime('%H:%M:%S')}] on_failure -> ran {sid} ok={ok} run_id={run_id} (failure from {failed_script_id})")
 
                     finally:
                         running.remove(sid)
@@ -166,7 +166,7 @@ def main(poll_interval: float = 0.5) -> None:
 
                 try:
                     ok, run_id = run_script(s, timeout_seconds=20.0)
-                    print(f"[{time.strftime('%H:%M:%S')}] ran {sid} ok={ok} run_id={run_id})")
+                    print(f"[{time.strftime('%H:%M:%S')}] ran {sid} ok={ok} run_id={run_id}")
 
                     if stype == "interval":
                         seconds = float(sched.get("seconds", 0))
