@@ -5,6 +5,7 @@ from .registry import discover_scripts, list_scripts, update_manifest
 from .runner import run_script
 from .installer import install_script_from_folder
 from .logs import last_run_by_script, tail_follow
+from .validator import validate_script_folder
 
 def main(argv=None) -> int:
     argv = argv or sys.argv[1:]
@@ -120,6 +121,20 @@ def main(argv=None) -> int:
                 return 2
         tail_follow(n=n)
         return 0
+    
+    if cmd == "validate":
+        if len(argv) < 2:
+            print("Usage: python -m control_core.cli validate <folder>")
+            return 2
+        ok, errs = validate_script_folder(argv[1])
+        
+        if ok:
+            print("OK: Script folder looks valid")
+            return 0
+        print("NOT OK:")
+        for e in errs:
+            print(f" - {e}")
+        return 1
     
     print(f"Unknown command: {cmd}")
     return 2
