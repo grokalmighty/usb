@@ -36,7 +36,7 @@ def get_history(script_id: str, n: int = 20) -> List[dict]:
 
     return list(buf)
 
-def formal_event(e: dict) -> str:
+def format_event(e: dict) -> str:
     ended = e.get("ended_at") or e.get("started_at")
     t = time.strftime("%H:%M:%S", time.localtime(ended)) if isinstance(ended, (int, float)) else "unknown"
 
