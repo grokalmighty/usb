@@ -1,0 +1,228 @@
+run_id,script_id,script_name,ok,exit_code,started_at,ended_at,duration_ms,timeout,timeout_seconds,stdout,stderr,error,extra_json
+7ecea74c-1ae6-4d31-840f-6a57ae949765,example,Example Script,False,1,1767984216.576264,1767984216.615568,39.30401802062988,,20.0,,"Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+","Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",{}
+0bce44a3-f5ac-4eb1-b4ee-3e33fcce840a,notify,macOS Notify on Failure,True,0,1767984217.118968,1767984217.1827781,63.810110092163086,,20.0,"Notified: example 7ecea74c-1ae6-4d31-840f-6a57ae949765 RuntimeError: boom
+","106:114: syntax error: A identifier can’t go after this “""”. (-2740)
+",,{}
+ba5ad007-2299-4e46-9e8a-a40faaee431b,alert,Alert on Failure,True,0,1767984217.183048,1767984217.1998951,16.84713363647461,,20.0,"ALERT: Script failure
+script_id: example
+run_id: 7ecea74c-1ae6-4d31-840f-6a57ae949765
+
+traceback:
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",,,{}
+ce982f45-4e21-484d-ba29-c80c7a6ee36d,hello2,Hello2,True,0,1767984217.7070222,1767984217.7413929,34.37066078186035,,20.0,"Hello from hello2
+",,,{}
+2710e8f2-ada0-45c5-9b9f-ec29c4c7e034,example,Example Script,False,1,1767984219.761108,1767984219.799268,38.160085678100586,,20.0,,"Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+","Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",{}
+889b20d7-6004-4c13-ac2e-6f731a35dda5,notify,macOS Notify on Failure,True,0,1767984220.301721,1767984220.3654232,63.70210647583008,,20.0,"Notified: example 2710e8f2-ada0-45c5-9b9f-ec29c4c7e034 RuntimeError: boom
+","106:114: syntax error: A identifier can’t go after this “""”. (-2740)
+",,{}
+a4e7098a-c06a-436d-b76b-fa1c3d782cb6,alert,Alert on Failure,True,0,1767984220.365664,1767984220.3823519,16.687870025634766,,20.0,"ALERT: Script failure
+script_id: example
+run_id: 2710e8f2-ada0-45c5-9b9f-ec29c4c7e034
+
+traceback:
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",,,{}
+94fb86a3-29c6-4827-ace8-15f41add2334,hello2,Hello2,True,0,1767984222.910609,1767984222.9431748,32.56583213806152,,20.0,"Hello from hello2
+",,,{}
+a64e7104-69dc-43cd-ab9d-46c4e9ecd43c,example,Example Script,False,1,1767984222.9435241,1767984222.967453,23.92888069152832,,20.0,,"Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+","Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",{}
+da565bae-2255-44d3-b41f-17b2ab602a9f,notify,macOS Notify on Failure,True,0,1767984223.475355,1767984223.539086,63.73119354248047,,20.0,"Notified: example a64e7104-69dc-43cd-ab9d-46c4e9ecd43c RuntimeError: boom
+","106:114: syntax error: A identifier can’t go after this “""”. (-2740)
+",,{}
+8d033d5e-6311-4ddf-b338-a61809729776,alert,Alert on Failure,True,0,1767984223.539349,1767984223.556489,17.139911651611328,,20.0,"ALERT: Script failure
+script_id: example
+run_id: a64e7104-69dc-43cd-ab9d-46c4e9ecd43c
+
+traceback:
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",,,{}
+c9c0a853-5867-41f9-8538-5e664d627946,hello2,Hello2,True,0,1767985698.0429041,1767985698.058788,15.883922576904297,,20.0,"Hello from hello2
+",,,{}
+3e65ec6d-85dd-4cb0-8bac-dbaf0380be6e,example,Example Script,False,1,1767985698.059181,1767985698.076292,17.11106300354004,,20.0,,"Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+","Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",{}
+3e94fd6b-dc6e-4c68-95c1-c637177bcb46,notify,macOS Notify on Failure,True,0,1767985698.5829601,1767985698.685956,102.9958724975586,,20.0,"Notified: example 3e65ec6d-85dd-4cb0-8bac-dbaf0380be6e RuntimeError: boom
+","106:114: syntax error: A identifier can’t go after this “""”. (-2740)
+",,{}
+39017140-f814-4dc5-a81f-3c9a6879c1e0,alert,Alert on Failure,True,0,1767985698.686526,1767985698.705788,19.261837005615234,,20.0,"ALERT: Script failure
+script_id: example
+run_id: 3e65ec6d-85dd-4cb0-8bac-dbaf0380be6e
+
+traceback:
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",,,{}
+ab072a61-68e8-4ddf-8270-a300026f1f69,example,Example Script,False,1,1767985701.231009,1767985701.26993,38.92087936401367,,20.0,,"Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+","Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",{}
+d12b6cb8-035d-406e-8056-19ef3a5ce4d9,notify,macOS Notify on Failure,True,0,1767985701.773221,1767985701.8380978,64.87679481506348,,20.0,"Notified: example ab072a61-68e8-4ddf-8270-a300026f1f69 RuntimeError: boom
+","106:114: syntax error: A identifier can’t go after this “""”. (-2740)
+",,{}
+07e37bee-72c2-444e-9b39-67943232082f,alert,Alert on Failure,True,0,1767985701.8383539,1767985701.854756,16.402244567871094,,20.0,"ALERT: Script failure
+script_id: example
+run_id: ab072a61-68e8-4ddf-8270-a300026f1f69
+
+traceback:
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",,,{}
+82ddbeb2-52c2-4725-9f86-2f340117964b,hello2,Hello2,True,0,1767985703.3747761,1767985703.4030201,28.2440185546875,,20.0,"Hello from hello2
+",,,{}
+1bd64405-c1fd-4d4e-a7d2-4e3ced1612bd,example,Example Script,False,1,1767985704.416695,1767985704.456002,39.3068790435791,,20.0,,"Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+","Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",{}
+e1bca5f0-b4da-4fc4-a75a-eb778e6e2038,notify,macOS Notify on Failure,True,0,1767985704.9633012,1767985705.0289652,65.66405296325684,,20.0,"Notified: example 1bd64405-c1fd-4d4e-a7d2-4e3ced1612bd RuntimeError: boom
+","106:114: syntax error: A identifier can’t go after this “""”. (-2740)
+",,{}
+8d188ca5-042a-4023-93d4-7a80f3c89771,alert,Alert on Failure,True,0,1767985705.029242,1767985705.04606,16.81804656982422,,20.0,"ALERT: Script failure
+script_id: example
+run_id: 1bd64405-c1fd-4d4e-a7d2-4e3ced1612bd
+
+traceback:
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",,,{}
+caead676-2cf4-400c-b031-fd158f8a7be7,example,Example Script,False,1,1767985707.5708969,1767985707.6029382,32.041311264038086,,20.0,,"Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+","Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",{}
+f8c63dc0-b7e7-4528-9c41-1a58c81776da,notify,macOS Notify on Failure,True,0,1767985708.110018,1767985708.1750898,65.07182121276855,,20.0,"Notified: example caead676-2cf4-400c-b031-fd158f8a7be7 RuntimeError: boom
+","106:114: syntax error: A identifier can’t go after this “""”. (-2740)
+",,{}
+7d07151c-ca61-4601-a854-9354a4252807,alert,Alert on Failure,True,0,1767985708.175732,1767985708.1944818,18.74995231628418,,20.0,"ALERT: Script failure
+script_id: example
+run_id: caead676-2cf4-400c-b031-fd158f8a7be7
+
+traceback:
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+    import os, json, importlib; m=importlib.import_module('control_core.scripts.example.main'); payload=json.loads(os.environ.get('CONTROL_CORE_PAYLOAD','{}')); fn=getattr(m, 'main'); fn(payload) if fn.__code__.co_argcount >= 1 else fn()
+                                                                                                                                                                                                                                         ~~^^
+  File ""/Users/jas/projects/usb/control_core/scripts/example/main.py"", line 4, in main
+    raise RuntimeError(""boom"")
+RuntimeError: boom
+",,,{}
+a2400927-6165-428e-bc8b-284e6daea652,hello2,Hello2,True,0,1767985708.70155,1767985708.7299762,28.426170349121094,,20.0,"Hello from hello2
+",,,{}
