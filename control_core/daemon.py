@@ -5,6 +5,7 @@ from typing import Dict, Set
 
 from .registry import discover_scripts, Script
 from .runner import run_script
+from .daemon_state import write_pid, clear_pid
 
 LOG_PATH = Path(__file__).resolve().parent.parent / "data" / "logs.jsonl"
 
@@ -14,7 +15,7 @@ def _abs_path(p: str) -> Path:
 
 def main(poll_interval: float = 0.5) -> None:
     print("Control Core daemon starting...(Ctrl+C to stop)")
-
+    write_pid()
     # Interval schedules: due next epoch time
     next_due: Dict[str, float] = {}
 
@@ -182,3 +183,5 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("\nDaemon stopped.")
+    finally:
+        clear_pid()
