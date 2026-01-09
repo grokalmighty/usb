@@ -307,6 +307,37 @@ def main(argv=None) -> int:
         
         script_id = argv[1]
 
+        payload = {"trigger": True}
+        timeout = 20.0
+
+        if "--timeout" in argv:
+            i = argv.index("--timeout")
+            if i + 1 >= len(argv):
+                print("Missing value after --timeout")
+                return 2
+            try:
+                timeout = float(argv[i + 1])
+            except ValueError:
+                print("timeout must be a number")
+                return 2
+        
+        if "--payload" in argv:
+            i = argv.index("--payload")
+            if i + 1 >= len(argv):
+                print("Missing value after --payload")
+                return 2
+            import json as _json
+            try:
+                user_payload = _json.loads(argv[i + 1])
+            except Exception as e:
+                print(f"Invalid JSON for --payload: {e}")
+                return 2
+            if not isinstance(user_payload, dict):
+                print("--payload nust be a JSON object")
+                return 2
+            
+            payload.update(user_payload)
+
         from .registry import discover_scripts
         from .runner import run_script
 
@@ -319,7 +350,7 @@ def main(argv=None) -> int:
             print(f"Script is disabled: {script_id}")
             return 1
 
-        ok, run_id = run_script(s, timeout_seconds=20.0, payload={"trigger": True})
+        ok, run_id = run_script(s, timeout_seconds=timeout, payload=payload)
         print(f"Triggered {script_id} ok={ok} run_id={run_id}")
         return 0
             
