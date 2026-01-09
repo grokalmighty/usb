@@ -73,7 +73,7 @@ def build_report(last_n: int = 200) -> dict:
             t = e.get("ended_at") or e.get("started_at")
             if isinstance(t, (int, float)):
                 d["last_fail_time"] = t
-            d["last_fail_time"] = _err_line(e)
+            d["last_fail_line"] = _err_line(e)
     
     rows = []
     for sid, d in per.items():
@@ -96,7 +96,7 @@ def format_report(rep: dict) -> str:
     lines.append(f"Report (last {last_n} events)")
     lines.append("")
     lines.append("Top failure rates:")
-    lines.append(f"{'script':10} {'runs':>5} {'fails':>5} {'fail':>6} {'avg_ms':>8} last_failure")
+    lines.append(f"{'script':10} {'runs':>5} {'fails':>5} {'fail%':>6} {'avg_ms':>8} last_failure")
     for fail_pct, fails, sid, runs, avg_ms, last_fail_time, last_fail_line in rep["rows"][:10]:
         avg_ms_s = f"{avg_ms:.1f}" if isinstance(avg_ms, (int, float)) else "-"
         if isinstance(last_fail_time, (int, float)):
