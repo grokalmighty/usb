@@ -7,6 +7,7 @@ from .installer import install_script_from_folder
 from .logs import last_run_by_script, tail_follow
 from .validator import validate_script_folder
 from .daemon_state import read_pid, pid_is_running, PID_PATH
+from .stats import compute_stats
 
 def main(argv=None) -> int:
     argv = argv or sys.argv[1:]
@@ -174,6 +175,35 @@ def main(argv=None) -> int:
             print(f"Failed to stop daemon: {e}")
             return 1
     
+    if cmd == "stats":
+        # Usage: stats [n]
+        n = 200
+        if len(argv) >= 2:
+            try:
+                n = int(argv[1])
+            except ValueError:
+                print("Usage: python-m control_core.cli stats [n]")
+                return 2
+        
+        stats = compute_stats(last_n=n)
+        if not stats:
+            print("No stats yet (logs empty).")
+            return 0
+    
+        print(f"Stats (last {n} events):")
+        print(f"{'script':10} {'runs':>5} {'fails':>5} {'fail':>6} {'avg_ms':>8} {'last_ok':>7} last_run_id")
+
+        for sid in sorted(stats.keys()):
+            d = stats[sid]
+            runs = d["runs"]
+            fails = d["fails"]
+            fail_pct = (fails / runs * 100.0) if runs else 0.0
+            avg_ms = d["avg_ms"]
+            last_ok = d["last_ok"]
+            rid = d["last_run_id"] or ""
+            print(f"{sid:10} {runs:5} {fails:5} {fail_pct:6.1f}% {avg_ms:8.1f} {str(last_ok):>7} {rid}")
+            return 0
+        
     print(f"Unknown command: {cmd}")
     return 2
 
