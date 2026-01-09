@@ -8,6 +8,7 @@ from .logs import last_run_by_script, tail_follow
 from .validator import validate_script_folder
 from .daemon_state import read_pid, pid_is_running, PID_PATH
 from .stats import compute_stats
+from .history import get_history, format_event
 
 def main(argv=None) -> int:
     argv = argv or sys.argv[1:]
@@ -203,6 +204,30 @@ def main(argv=None) -> int:
             rid = d["last_run_id"] or ""
             print(f"{sid:10} {runs:5} {fails:5} {fail_pct:6.1f}% {avg_ms:8.1f} {str(last_ok):>7} {rid}")
             return 0
+    
+    if cmd == "history":
+        if len(argv) < 2:
+            print("Usage: python -m control_core.cli history <script_id> [n]")
+            return 2
+        
+        script_id = argv[1]
+        n = 20
+        if len(argv) >= 3:
+            try:
+                n = int(argv[2])
+            except ValueError:
+                print("Usage: python -m control_core.cli history <script_id> [n]")
+                return 2
+        
+        events = get_history(script_id, n=n)
+        if not events:
+            print(f"No history for script_id={script_id}")
+            return 0
+        
+        print(f"History for {script_id} (last {len(events)} runs):")
+        for e in events:
+            print(" - " + format_event(e))
+        return 0
         
     print(f"Unknown command: {cmd}")
     return 2
