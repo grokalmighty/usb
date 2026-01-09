@@ -1,4 +1,5 @@
 import os 
+import signal
 from pathlib import Path
 from typing import Optional
 
@@ -35,3 +36,6 @@ def pid_is_running(pid: int) -> bool:
         return False
     except PermissionError:
         return True
+
+def stop_pid(pid: int) -> None:
+    os.kill(pid, signal.SIGTERM)
