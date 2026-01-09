@@ -1,2 +1,2 @@
 def main():
-    print("Hello from hello2")
+    raise RuntimeError("hello2 boom")

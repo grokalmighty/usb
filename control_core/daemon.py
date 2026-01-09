@@ -76,7 +76,15 @@ def main(poll_interval: float = 0.5) -> None:
 
             elif stype == "on_failure":
                 pass 
+        
+        try:
+            size = LOG_PATH.stat().st_size
+            if size < log_pos:
+                log_pos = 0
 
+        except FileNotFoundError:
+            log_pos = 0
+            
         # Detect new failures and fire on_failure scripts
         try:
             with LOG_PATH.open("r", encoding="utf-8") as f:

@@ -1,4 +1,4 @@
 import time 
 
 def main():
-    print("Hi")
+    raise RuntimeError("boom")
