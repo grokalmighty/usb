@@ -26,3 +26,10 @@ def _duration_ms(e: dict) -> float | None:
     if isinstance(s, (int, float)) and isinstance(en, (int, float)) and en >= s:
         return (en - s) * 1000.0
     return None
+
+def _err_line(e: dict) -> str:
+    text = (e.get("error") or e.get("stderr") or "").strip()
+    if not text:
+        return ""
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    return lines[-1] if lines else ""
