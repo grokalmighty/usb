@@ -22,3 +22,16 @@ def clear_pid() -> None:
     except TypeError:
         if PID_PATH.exists():
             PID_PATH.unlink()
+
+def pid_is_running(pid: int) -> bool:
+    """
+    os.kill(pid, 0) checks existence/permission.
+    """
+
+    try:
+        os.kill(pid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
