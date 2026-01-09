@@ -1,5 +1,5 @@
 import time 
 
 def main():
-    raise RuntimeError("boom")
-    # print("Hi")
+    # raise RuntimeError("boom")
+    print("Hi")

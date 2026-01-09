@@ -35,12 +35,15 @@ def tail_follow(n: int = 20, poll: float = 0.5) -> None:
         lines = f.readlines()
         for line in lines[-n:]:
             print(line.rstrip())
-
-        while True:
-            where = f.tell()
-            line = f.readline()
-            if not line:
-                time.sleep(poll)
-                f.seek(where)
-                continue
-            print(line.rstrip())
+        try:
+            while True:
+                where = f.tell()
+                line = f.readline()
+                if not line:
+                    time.sleep(poll)
+                    f.seek(where)
+                    continue
+                print(line.rstrip())
+        except KeyboardInterrupt:
+            print("\nStopped tail.")
+        

@@ -19,6 +19,25 @@ def _iter_events() -> Iterable[dict]:
             except json.JSONDecodeError:
                 continue
 
+def _iter_events_since(since_epoch: float) -> Iterable[dict]:
+    if not LOG_PATH.exists():
+        return []
+    with LOG_PATH.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            t = e.get("ended_at")
+            if t is None:
+                t = e.get("started_at")
+            if isinstance(t, (int, float)) and t >= since_epoch:
+                yield e
+
 def _duration_ms(e: dict) -> float | None:
     s = e.get("started_at")
     en = e.get("ended_at")
@@ -87,10 +106,57 @@ def build_report(last_n: int = 200) -> dict:
 
     return {"rows": rows, "slowest": slowest, "last_n": last_n}
 
+def build_report_minutes(minutes: int = 60) -> dict:
+    since = time.time() - (minutes * 60)
+    per = defaultdict(lambda: {
+        "runs": 0, "fails": 0, "dur_sum": 0.0, "dur_n": 0, "last_fail_time": None, "last_fail_line": "",
+    })
+    slowest: List[Tuple[float, str, str]] = []
+
+    count = 0
+    for e in _iter_events_since(since):
+        count += 1
+        sid = e.get("script_id")
+        if not sid:
+            continue
+        d = per[sid]
+        d["runs"] += 1
+
+        ok = bool(e.get("ok"))
+        ms = _duration_ms(e)
+        if ms is not None:
+            d["dur_sum"] += ms
+            d["dur_n"] += 1
+            slowest.append((ms, sid, e.get("run_id", "")))
+        
+        if not ok:
+            d["fails"] += 1
+            t = e.get("ended_at") or e.get("started_at")
+            if isinstance(t, (int, float)):
+                d["last_fail_time"] = t
+            d["last_fail_line"] = _err_line(e)
+    
+    rows = []
+    for sid, d in per.items():
+        runs = d["runs"]
+        fails = d["fails"]
+        fail_pct = (fails / runs * 100.0) if runs else 0.0
+        avg_ms = (d["dur_sum"] / d["dur_n"]) if d["dur_n"] else None
+        rows.append((fail_pct, fails, sid, runs, avg_ms, d["last_fail_time"], d["last_fail_line"]))
+
+    rows.sort(reverse=True)
+    slowest.sort(reverse=True)
+    slowest = slowest[:10]
+
+    return {"rows": rows, "slowest": slowest, "window": f"last {minutes} minutes", "event_count": count}
+
 def format_report(rep: dict) -> str:
     lines: List[str] = []
-    last_n = rep["last_n"]
-    lines.append(f"Report (last {last_n} events)")
+    header = rep.get("window")
+    if header:
+        lines.append(f"Report ({header}, {rep.get('event_count', 0)} events)")
+    else:
+        lines.append(f"Report (last {rep['last_n']} events)")
     lines.append("")
     lines.append("Top failure rates:")
     lines.append(f"{'script':10} {'runs':>5} {'fails':>5} {'fail%':>6} {'avg_ms':>8} last_failure")
@@ -107,7 +173,7 @@ def format_report(rep: dict) -> str:
     lines.append("")
     lines.append("Slowest runs:")
     lines.append(f"{'ms':>8} {'script':10} run_id")
-    for ms, sid, run_id, in rep["slowest"]:
+    for ms, sid, run_id in rep["slowest"]:
         lines.append(f"{ms:8.1f} {sid:10} {run_id}")
     
     return "\n".join(lines)
