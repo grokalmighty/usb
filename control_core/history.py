@@ -35,3 +35,26 @@ def get_history(script_id: str, n: int = 20) -> List[dict]:
                 buf.append(e)
 
     return list(buf)
+
+def formal_event(e: dict) -> str:
+    ended = e.get("ended_at") or e.get("started_at")
+    t = time.strftime("%H:%M:%S", time.localtime(ended)) if isinstance(ended, (int, float)) else "unknown"
+
+    ok = e.get("ok")
+    run_id = e.get("run_id", "")
+    started = e.get("started_at")
+    ended2 = e.get("ended_at")
+    ms = ""
+
+    if isinstance(started, (int, float)) and isinstance(ended2, (int, float)) and ended2 >= started:
+        ms = f"{(ended2 - started) * 1000.0:.1f}ms"
+
+    # Show a short error if any
+    err = (e.get("error") or e.get("stderr") or "").strip()
+    err_line = ""
+    if err:
+        lines = [ln.strip() for ln in err.splitlines() if ln.strip()]
+        err_line = lines[-1] if lines else ""
+    
+    tail = f" {err_line}" if err_line else ""
+    return f"{t} ok={ok} {ms:>10} run_id={run_id}{tail}"
