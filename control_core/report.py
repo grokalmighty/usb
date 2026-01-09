@@ -53,7 +53,7 @@ def _err_line(e: dict) -> str:
     lines = [ln.rstrip() for ln in text.splitlines() if ln.strip()]
     return lines[-1] if lines else ""
 
-def build_report(last_n: int = 200, script_id: str | None = None) -> dict:
+def build_report(last_n: int = 200, script_id: str | None = None, fails_only: bool = False) -> dict:
     recent = deque(maxlen=last_n)
     for e in _iter_events():
         recent.append(e)
@@ -78,10 +78,13 @@ def build_report(last_n: int = 200, script_id: str | None = None) -> dict:
         if script_id and sid != script_id:
             continue
 
+        ok = bool(e.get("ok"))
+        if fails_only and ok:
+            continue
+
         d = per[sid]
         d["runs"] += 1
 
-        ok = bool(e.get("ok"))
         ms = _duration_ms(e)
         if ms is not None:
             d["dur_sum"] += ms
@@ -95,6 +98,10 @@ def build_report(last_n: int = 200, script_id: str | None = None) -> dict:
                 d["last_fail_time"] = t
             d["last_fail_line"] = _err_line(e)
     
+    if fails_only:
+        per = {sid: d for sid, d in per.items() if d["fails"] > 0}
+        slowest = [t for t in slowest if t[1] in per]
+
     rows = []
     for sid, d in per.items():
         runs = d["runs"]
@@ -112,9 +119,14 @@ def build_report(last_n: int = 200, script_id: str | None = None) -> dict:
 
     if script_id:
         window = f"{window}, script={script_id}"
-    return {"rows": rows, "slowest": slowest, "window": window, "last_n": last_n, "event_count": len(recent)}
+    
+    if fails_only:
+        window = f"{window}, fails-only"
 
-def build_report_minutes(minutes: int = 60, script_id: str | None = None) -> dict:
+    event_count = sum(d["runs"] for d in per.values())
+    return {"rows": rows, "slowest": slowest, "window": window, "last_n": last_n, "event_count": event_count}
+
+def build_report_minutes(minutes: int = 60, script_id: str | None = None, fails_only: bool = False) -> dict:
     since = time.time() - (minutes * 60)
     per = defaultdict(lambda: {
         "runs": 0, "fails": 0, "dur_sum": 0.0, "dur_n": 0, "last_fail_time": None, "last_fail_line": "",
@@ -132,10 +144,11 @@ def build_report_minutes(minutes: int = 60, script_id: str | None = None) -> dic
         if script_id and sid != script_id:
             continue 
 
+        ok = bool(e.get("ok"))
+        if fails_only and ok:
+            continue
         d = per[sid]
         d["runs"] += 1
-
-        ok = bool(e.get("ok"))
         ms = _duration_ms(e)
         if ms is not None:
             d["dur_sum"] += ms
@@ -152,7 +165,7 @@ def build_report_minutes(minutes: int = 60, script_id: str | None = None) -> dic
     if script_id:
         per = {k: v for k, v in per.items() if k == script_id}
         slowest = [t for t in slowest if t[1] == script_id]
-        
+
     rows = []
     for sid, d in per.items():
         runs = d["runs"]
@@ -168,7 +181,12 @@ def build_report_minutes(minutes: int = 60, script_id: str | None = None) -> dic
     window = f"last {minutes} minutes"
     if script_id:
         window = f"{window}, script={script_id}"
-    return {"rows": rows, "slowest": slowest, "window": window, "event_count": count}
+
+    if fails_only:
+        window = f"{window}, fails-only"
+    
+    event_count = sum(d["runs"] for d in per.values())
+    return {"rows": rows, "slowest": slowest, "window": window, "event_count": event_count}
 
 def format_report(rep: dict) -> str:
     lines: List[str] = []

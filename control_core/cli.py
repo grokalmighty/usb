@@ -258,6 +258,9 @@ def main(argv=None) -> int:
         return 0
 
     if cmd == "report":
+
+        fails_only = "--fails-only" in argv 
+        
         # Script filter
         script_id = None
         if "--script" in argv:
@@ -279,10 +282,10 @@ def main(argv=None) -> int:
                 print("minutes must be an integer")
                 return 2
             from .report import build_report_minutes, format_report
-            rep = build_report_minutes(minutes=minutes, script_id=script_id)
+            rep = build_report_minutes(minutes=minutes, script_id=script_id, fails_only=fails_only)
             print(format_report(rep))
             return 0
-        
+
         # Default last-n
         n = 200
         if len(argv) >= 2:
@@ -293,7 +296,7 @@ def main(argv=None) -> int:
                 return 2
         
         from .report import build_report, format_report
-        rep = build_report(last_n=n, script_id=script_id)
+        rep = build_report(last_n=n, script_id=script_id, fails_only=fails_only)
         print(format_report(rep))
         return 0
         
