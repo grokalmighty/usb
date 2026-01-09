@@ -15,3 +15,10 @@ def read_pid() -> Optional[int]:
         return int(PID_PATH.read_text(encoding="utf-8").strip())
     except Exception:
         return None
+    
+def clear_pid() -> None:
+    try:
+        PID_PATH.unlink(missing_ok=True)
+    except TypeError:
+        if PID_PATH.exists():
+            PID_PATH.unlink()
