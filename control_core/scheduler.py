@@ -29,3 +29,6 @@ def due_to_run(script: Script, state: Dict[str, Any], now: float) -> Tuple[bool,
         return True, interval
     
     return (now - float(last)) >= interval, interval
+
+def mark_fired(script: Script, state: Dict[str, Any], fired_at: float) -> None:
+    state.setdefault(script.id, {})["last_fired_at"] = fired_at
