@@ -99,7 +99,7 @@ def discover_scripts() -> Dict[str, Script]:
             name=data.get("name", data["id"]),
             enabled=bool(data.get("enabled", False)),
             entrypoint=data["entrypoint"],
-            schedule=data.get("schedule", {}),
+            schedule=_normalize_schedule(data.get("schedule", {})),
             path=script_dir,
             lock_group=lock_group,
             lock_mode=lock_mode,
