@@ -40,3 +40,29 @@ def list_process_names() -> Set[str]:
         return names
     except Exception:
         return set()
+    
+def get_local_ip() -> Optional[str]:
+    """
+    Returns local IP used for default route, or None if network seems down.
+    """
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.settimeout(1.0)
+            s.connect(("8.8.8.8", 53))
+            return s.getsockname()[0]
+        finally:
+            s.close()
+    except Exception:
+        return None
+
+def match_apps(event_apps: Optional[List[str]], opened_or_closed: str) -> bool:
+    """
+    If event_apps is None/empty => match any app.
+    Else match against list.
+    """
+
+    if not event_apps:
+        return True
+    return opened_or_closed in set(event_apps)
