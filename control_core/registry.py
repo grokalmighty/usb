@@ -84,6 +84,38 @@ def _normalize_schedule(sched: dict) -> dict:
             out["days"] = days
         return out 
     
+    if stype == "event":
+        event = sched.get("event")
+        if not isinstance(event, str) or not event.strip():
+            return {}
+        
+        out = {"type": "event", "event": event.strip()}
+
+        # Idle seconds
+        if out["event"] == "idle":
+            try:
+                seconds = float(sched.get("seconds", 0))
+            except Exception:
+                seconds = 0
+            if seconds <= 0:
+                return {}
+            out["seconds"] = seconds 
+
+        # Apps list
+        if out["event"] == ("app_open", "app_close"):
+            apps = sched.get("apps")
+            if isinstance(apps, str):
+                apps_list = [a.strip() for a in apps.split(",") if a.strip()]
+            elif isinstance(apps, list):
+                apps_list = [a.strip() for a in apps if isinstance(a, str) and a.strip()]
+            else:
+                apps_list = []
+            
+            if apps_list:
+                out["apps"] = apps_list
+        
+        return out
+    
     if stype == "file_watch":
         p = sched.get("path")
         if not p:
