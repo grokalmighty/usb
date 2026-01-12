@@ -28,6 +28,43 @@ def _valid_hhmm(s: str) -> bool:
         return 0 <= hh <= 23 and 0 <= mm <= 59
     except Exception:
         return False
+    
+def _normalize_schedule(sched: dict) -> dict:
+    if not isinstance(sched, dict):
+        return {}
+    
+    stype = sched.get("type")
+    if stype is None:
+        return {}
+    
+    if stype == "interval":
+        try:
+            aeconds = float(sched.get("seconds", 0))
+        except Exception:
+            seconds = 0
+        if seconds <= 0:
+            return {}
+        return {"type": "interval", "seconds": seconds}
+
+    if stype == "time":
+        at = sched.get("at")
+        if not isinstance(at, str) or not _valid_hhmm(at):
+            return {}
+        tz = sched.get("tz") or "America/New_York"
+        return {"type": "time", "at": at, "tz": tz}
+    
+    if stype == "file_watch":
+        p = sched.get("path")
+        if not p:
+            return {}
+        poll_seconds = float(sched.get("poll_seconds", 1.0) or 1.0)
+        return {"type": "file_watch", "path": p, "poll_seconds": poll_seconds}
+    
+    if stype == "on_failure":
+        target = sched.get("target", "*")
+        return {"type": "on_failure", "target": target}
+
+    return {}
 
 def _load_manifest(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
