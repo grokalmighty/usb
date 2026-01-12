@@ -55,13 +55,6 @@ def due_to_run(script: Script, state: Dict[str, Any], now: float) -> Tuple[bool,
     
     if stype == "time":
         at = sched.get("at")
-        if not isinstance(at, str):
-            return False, None
-        
-        hhmm = _parse_hhmm(at)
-        if hhmm is None:
-            return False, None
-        hh, mm = hhmm
         tzname = sched.get("tz") or "America/New_York"
         try:
             tz = ZoneInfo(tzname)
@@ -69,25 +62,49 @@ def due_to_run(script: Script, state: Dict[str, Any], now: float) -> Tuple[bool,
             tz = ZoneInfo("America/New_York")
         
         now_dt = datetime.fromtimestamp(now, tz=tz)
+        today_key = now_dt.strftime("%Y-%m-%d")
+
         days = sched.get("days")
         if isinstance(days, list) and days:
             try:
-                iso = now_dt.isoweekday()
                 allowed = {int(d) for d in days}
-                if iso not in allowed:
+                if now_dt.isoweekday() not in allowed:
                     return False, None
             except Exception: 
-                pass
-        today_key = now_dt.strftime("%Y-%m-%d")
+                return False, None
 
-        last_day = state.get(script.id, {}).get("last_fired_day")
-        if last_day == today_key:
+        # Normalize 
+        times: list[str]
+        if isinstance(at, str):
+            times = [at]
+        elif isinstance(at, list):
+            times = [x for x in at if isinstance(x, str)]
+        else:
             return False, None
         
-        scheduled_dt = now_dt.replace(hour=hh, minute=mm, second=0, microsecond=0)
-        if now_dt >= scheduled_dt:
-            return True, None
+        # Parse valid times
+        parsed: list[tuple[int, int, str]] = []
+        for t in times:
+            hhmm = _parse_hhmm(t)
+            if hhmm is None:
+                continue
+            hh, mm = hhmm
+            parsed.append((hh, mm, f"{hh:02d}:{mm:02d}"))
         
+        if not parsed:
+            return False, None
+        
+        fired = state.get(script.id, {}).get("fired_times")
+        fired_set = set(fired) if isinstance(fired, list) else set()
+
+        parsed.sort()
+        for hh, mm, key in parsed:
+            scheduled_dt = now_dt.replace(hour=hh, minute=mm, second=0, microsecond=0)
+            if now_dt >= scheduled_dt and key not in fired_set:
+                state.setdefault(script.id, {})["_pending_time_key"] = key
+                state.setdefault(script.id, {})["_pending_day"] = today_key
+                return True, None
+            
         return False, None
     
     return False, None
@@ -106,5 +123,23 @@ def mark_fired(script: Script, state: Dict[str, Any], fired_at: float) -> None:
             tz = ZoneInfo(tzname)
         except Exception:
             tz = ZoneInfo("America/New_York")
-        state.setdefault(script.id, {})["last_fired_day"] = _today_key(fired_at, tz)
+        
+        day = _today_key(fired_at, tz)
+
+        entry = state.setdefault(script.id, {})
+
+        if entry.get("last_fired_day") != day:
+            entry["last_fired_day"] = day
+            entry["fired_times"] = []
+
+        key = entry.pop("_pending_time_key", None)
+        entry.pop("_pending_day", None)
+
+        if isinstance(key, str):
+            ft = entry.get("fired_times")
+            if not isinstance(ft, list):
+                ft = []
+            if key not in ft:
+                ft.append(key)
+            entry["fired_times"] = ft
         return 

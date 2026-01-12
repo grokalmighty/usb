@@ -39,7 +39,7 @@ def _normalize_schedule(sched: dict) -> dict:
     
     if stype == "interval":
         try:
-            aeconds = float(sched.get("seconds", 0))
+            seconds = float(sched.get("seconds", 0))
         except Exception:
             seconds = 0
         if seconds <= 0:
@@ -48,10 +48,41 @@ def _normalize_schedule(sched: dict) -> dict:
 
     if stype == "time":
         at = sched.get("at")
-        if not isinstance(at, str) or not _valid_hhmm(at):
+        
+        if isinstance(at, str):
+            times = [at]
+        
+        elif isinstance(at, list):
+            times = [x for x in at if isinstance(x, str)]
+        
+        else:
             return {}
+        
+        norm_times: list[str] = []
+        for t in times:
+            if _valid_hhmm(t):
+                hh, mm = t.strip().split(":")
+                norm_times.append(f"{int(hh):02d}:{int(mm):02d}")
+
+        if not norm_times:
+            return {}
+        
         tz = sched.get("tz") or "America/New_York"
-        return {"type": "time", "at": at, "tz": tz}
+
+        days = sched.get("days")
+        if isinstance(days, list) and days:
+            try:
+                days = [int(d) for d in days]
+                days = [d for d in days if 1 <= d <= 7]
+            except Exception:
+                days = None
+        else:
+            days = None
+        
+        out = {"type": "time", "at": norm_times if len(norm_times) > 1 else norm_times[0], "tz": tz}
+        if days:
+            out["days"] = days
+        return out 
     
     if stype == "file_watch":
         p = sched.get("path")

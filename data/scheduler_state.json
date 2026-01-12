@@ -1,6 +1,9 @@
 {
   "hello2": {
-    "last_fired_at": 1768244955.483653,
-    "last_fired_day": "2026-01-12"
+    "last_fired_day": "2026-01-12",
+    "fired_times": [
+      "17:10",
+      "17:12"
+    ]
   }
 }

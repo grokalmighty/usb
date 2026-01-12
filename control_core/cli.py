@@ -122,6 +122,29 @@ def main(argv=None) -> int:
         print(f"Set {script_id} daily time to {at} ({tz})")
         return 0
     
+    if cmd == "set-time-weekdays":
+        if len(argv) < 3:
+            print("Usage: python -m control_core.cli set-time-weekdays <id> <HH:MM> [--tz <IANA_TZ>]")
+            return 2
+        
+        script_id = argv[1]
+        at = argv[2]
+
+        tz = "America/New_York"
+        if "--tz" in argv:
+            i = argv.index("--tz")
+            if i + 1 >= len(argv):
+                print("Missing value after --tz")
+                return 2
+            tz = argv[i + 1]
+        
+        def updater(m):
+            m["schedule"] = {"type": "time", "at": at, "tz": tz, "days": [1,2,3,4,5]}
+        
+        update_manifest(script_id, updater)
+        print(f"Set {script_id} time to {at} on weekdays (Mon-Fri) ({tz})")
+        return 0 
+    
     if cmd == "install":
         if len(argv) < 2:
             print("Usage: python -m control_core.cli install <folder> [--force]")

@@ -4,8 +4,15 @@
   "enabled": true,
   "schedule": {
     "type": "time",
-    "at": "15:09",
-    "tz": "America/New_York"
+    "at": ["17:10", "17:12"],
+    "tz": "America/New_York",
+    "days": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
   },
   "entrypoint": "control_core.scripts.hello2.main:main",
   "lock_mode": "skip",
