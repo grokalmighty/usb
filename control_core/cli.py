@@ -108,6 +108,16 @@ def main(argv=None) -> int:
         def updater(m):
             m["schedule"] = {"type": "time", "at": at, "tz": tz}
 
+        if ":" not in at or len(at.split(":")) != 2:
+            print("time must be HH:MM (24-hour)")
+            return 2
+        try:
+            hh = int(at.split(":")[0]); mm = int(at.split(":")[1])
+            if not (0 <= hh <= 23 and 0 <= mm <= 59):
+                raise ValueError()
+        except ValueError:
+            print("time must be HH:MM (00:00 to 23:59)")
+            return 2
         update_manifest(script_id, updater)
         print(f"Set {script_id} daily time to {at} ({tz})")
         return 0
