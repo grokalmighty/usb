@@ -9,6 +9,7 @@ from .runner import run_script
 from .daemon_state import write_pid, clear_pid
 from .scheduler_state import load_state, save_state
 from .scheduler import due_to_run, mark_fired
+from .events import get_idle_seconds_macos, list_process_names, get_local_ip, match_apps
 
 LOG_PATH = Path(__file__).resolve().parent.parent / "data" / "logs.jsonl"
 
@@ -46,10 +47,98 @@ def main(poll_interval: float = 0.5) -> int:
     log_pos = LOG_PATH.stat().st_size
 
     try:
+
+        # Event detector state
+        last_idle_mode = "active"
+        last_proc_names = list_process_names()
+        last_ip = get_local_ip()
+        last_net_up = last_ip is not None
+        last_net_change_ts = 0.0
+
         while not stop_flag["stop"]:
             now = time.time()
-
             scripts = discover_scripts()
+            events = []
+
+            # Idle detection
+            idle_seconds = get_idle_seconds_macos()
+
+            if idle_seconds is not None:
+                idle_thresholds = []
+                for sid, s in scripts.items():
+                    if not s.enabled:
+                        continue
+                    sched = s.schedule or {}
+                    if sched.get("type") == "event" and sched.get("event") == "idle":
+                        try:
+                            idle_thresholds.append(float(sched.get("seconds", 0)))
+                        except Exception:
+                            pass
+                
+                if idle_thresholds:
+                    mode = "idle" if idle_seconds >= min(idle_thresholds) else "active"
+                    if mode != last_idle_mode:
+                        last_idle_mode = mode
+                        events.append({"type": "idle_state", "mode": mode, "idle_seconds": idle_seconds})
+
+            for ev in events:
+                for sid, s in scripts.items():
+                    if not s.enabled:
+                        continue
+                    sched = s.schedule or {}
+                    if sched.get("type") != "event":
+                        continue
+
+                    want = sched.get("event")
+                    if want == "idle":
+                        if ev.get("type") != "idle_state" or ev.get("mode") != "idle":
+                            continue
+                        try:
+                            threshold = float(sched.get("seconds", 0))
+                        except Exception:
+                            continue
+                        if float(ev.get("idle_seconds", 0)) < threshold:
+                            continue
+
+                    elif want == "app_open":
+                        if ev.get("type") != "app_open":
+                            continue
+                        apps = sched.get("apps")
+                        if isinstance(apps, list) and apps:
+                            if ev.get("app") not in apps:
+                                continue
+
+                    elif want == "app_close":
+                        if ev.get("type") != "app_close":
+                            continue
+                        apps = sched.get("apps")
+                        if isinstance(apps, list) and apps:
+                            if ev.get("app") not in apps:
+                                continue
+
+                    elif want == "network_up":
+                        if ev.get("type") != "network_up":
+                            continue
+
+                    elif want == "network_down":
+                        if ev.get("type") != "network_down":
+                            continue
+                    
+                    else:
+                        continue
+
+                    if sid in running:
+                        continue
+                    running.add(sid)
+                    try:
+                        ok, run_id = run_script(
+                            s,
+                            timeout_seconds=20.0,
+                            payload={"event": ev, "trigger": "event"},
+                        )
+                        print(f"[{time.strftime('%H:%M:%S')}] event -> ran {sid} ok={ok} run_id={run_id} (event={want})")
+                    finally:
+                        running.remove(sid)
 
             # Purge state for disabled/missing scripts
             enabled_ids = {sid for sid, s in scripts.items() if s.enabled}
