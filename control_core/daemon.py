@@ -91,6 +91,7 @@ def main(poll_interval: float = 0.5) -> int:
                 events.append({"type": "app_open", "app": name})
             for name in closed:
                 events.append({"type": "app_close", "app": name})
+            
             # Dispatch
             for ev in events:
                 for sid, s in scripts.items():
@@ -151,6 +152,18 @@ def main(poll_interval: float = 0.5) -> int:
                     finally:
                         running.remove(sid)
 
+            # Network
+            ip = get_local_ip()
+            net_up = ip is not None
+            if net_up != last_net_up:
+                if now - last_net_change_ts >= 2.0:
+                    last_net_change_ts = now
+                    last_net_up = net_up
+                    if net_up:
+                        events.append({"type": "network_up", "ip": ip})
+                    else:
+                        events.append({"type": "network_down"})
+                        
             # Purge state for disabled/missing scripts
             enabled_ids = {sid for sid, s in scripts.items() if s.enabled}
             for sid in list(last_mtime.keys()):
