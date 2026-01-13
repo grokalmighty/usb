@@ -144,6 +144,27 @@ def main(argv=None) -> int:
         update_manifest(script_id, updater)
         print(f"Set {script_id} time to {at} on weekdays (Mon-Fri) ({tz})")
         return 0 
+
+    if cmd == "set-idle":
+        if len(argv) < 3:
+            print("Usage: python -m control_core.cli set-idle <id> <seconds>")
+            return 2
+        script_id = argv[1]
+        try:
+            seconds = float(argv[2])
+        except ValueError:
+            print("Seconds must be a number")
+            return 2
+        if seconds <= 0:
+            print("seconds must be > 0")
+            return 2
+        
+        def updater(m):
+            m["schedule"] = {"type": "event", "event": "idle", "seconds": seconds}
+        
+        update_manifest(script_id, updater)
+        print(f"Set {script_id} to run on idle >= {seconds}s")
+        return 0
     
     if cmd == "install":
         if len(argv) < 2:
