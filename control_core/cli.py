@@ -201,6 +201,15 @@ def main(argv=None) -> int:
         print(f"Set {script_id} to run on app_close ({'any' if not apps else apps})")
         return 0
     
+    if cmd == "set-network-up":
+        if len(argv) < 2:
+            print("Usage: python -m control-core.cli set-network-up <id>")
+            return 2
+        script_id = argv[1]
+        update_manifest(script_id, lambda m: m.__setitem__("schedule", {"type": "event", "event": "network_up"}))
+        print(f"Set {script_id} to run on network_up")
+        return 0
+    
     if cmd == "install":
         if len(argv) < 2:
             print("Usage: python -m control_core.cli install <folder> [--force]")
