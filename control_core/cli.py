@@ -165,6 +165,24 @@ def main(argv=None) -> int:
         update_manifest(script_id, updater)
         print(f"Set {script_id} to run on idle >= {seconds}s")
         return 0
+
+    if cmd == "set-app-open":
+        if len(argv) < 3:
+            print("Usage: python -m control_core.cli set-app-open <id> <app1, app2, ..., | *>")
+            return 2
+        script_id = argv[1]
+        apps_raw = argv[2]
+        apps = [] if apps_raw == "*" else [a.strip() for a in apps_raw.split(",") if a.strip()]
+
+        def updater(m):
+            sch = {"type": "event", "event": "app_open"}
+            if apps:
+                sch["apps"] = apps
+            m["schedule"] = sch
+
+        update_manifest(script_id, updater)
+        print(f"Set {script_id} to run on app_open ({'any' if not apps else apps})")
+        return 0
     
     if cmd == "install":
         if len(argv) < 2:
