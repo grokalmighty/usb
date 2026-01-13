@@ -4,6 +4,19 @@ import time
 import socket
 from typing import Optional, Set, Dict, Any, List
 
+def is_process_running_exact(name: str) -> bool:
+    """
+    True if a process with exact name exists.
+    """
+
+    try:
+        subprocess.check_output(["pgrep", "-x", name], stderr=subprocess.DEVNULL)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+    except Exception:
+        return False
+    
 def get_idle_seconds_macos() -> Optional[float]:
     """
     Returns idle seconds, or None if unsupported

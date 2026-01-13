@@ -9,7 +9,7 @@ from .runner import run_script
 from .daemon_state import write_pid, clear_pid
 from .scheduler_state import load_state, save_state
 from .scheduler import due_to_run, mark_fired
-from .events import get_idle_seconds_macos, list_process_names, get_local_ip, match_apps
+from .events import get_idle_seconds_macos, list_process_names, get_local_ip, match_apps, is_process_running_exact
 
 LOG_PATH = Path(__file__).resolve().parent.parent / "data" / "logs.jsonl"
 
@@ -54,12 +54,48 @@ def main(poll_interval: float = 0.5) -> int:
         last_ip = get_local_ip()
         last_net_up = last_ip is not None
         last_net_change_ts = 0.0
-
+        last_app_event: dict[tuple[str, str], float] = {}
+        app_state: Dict[str, bool] = {}
         while not stop_flag["stop"]:
             now = time.time()
             scripts = discover_scripts()
             events = []
 
+            # Collect watched apps from enabled scripts
+            watched_open = set()
+            watched_close = set()
+
+            for sid, s in scripts.items():
+                if not s.enabled:
+                    continue
+                sched = s.schedule or {}
+                if sched.get("type") == "event" and sched.get("event") == "app_open":
+                    apps = sched.get("apps")
+                    if isinstance(apps, list) and apps:
+                        watched_open.update(apps)
+                if sched.get("tyoe") == "event" and sched.get("event") == "app_close":
+                    apps = sched.get("apps")
+                    if isinstance(apps, list) and apps:
+                        watched_close.update(apps)
+            
+            watched = watched_open | watched_close
+
+            # Emit events only on state transitions
+            for app in watched:
+                cur_running = is_process_running_exact(app)
+                prev_running = app_state.get(app)
+
+                if prev_running is None:
+                    app_state[app] = cur_running
+                    continue
+
+                if not prev_running and cur_running:
+                    events.append({"type": "app_open", "app": app})
+                elif prev_running and not cur_running:
+                    events.append({"type": "app_close", "app": app})
+
+                app_state[app] = cur_running
+                
             # Idle detection
             idle_seconds = get_idle_seconds_macos()
 
@@ -88,6 +124,10 @@ def main(poll_interval: float = 0.5) -> int:
             last_proc_names = cur
             
             for name in opened:
+                k = ("open", name)
+                if now - last_app_event.get(k, 0.0) < 2.0:
+                    continue
+                last_app_event[k] = now
                 events.append({"type": "app_open", "app": name})
             for name in closed:
                 events.append({"type": "app_close", "app": name})

@@ -1,0 +1,10 @@
+{
+  "id": "network",
+  "name": "Network Script",
+  "enabled": true,
+  "schedule": {
+    "type": "event",
+    "event": "network_down"
+  },
+  "entrypoint": "control_core.scripts.network.main:main"
+}

@@ -9,5 +9,5 @@
       "Code"
     ]
   },
-  "entrypoint": "control_core.scripts.example.main:main"
+  "entrypoint": "control_core.scripts.app.main:main"
 }
