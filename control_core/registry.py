@@ -112,14 +112,24 @@ def _normalize_schedule(sched: dict) -> dict:
         return out 
     
     if stype == "event":
-        event = sched.get("event")
-        if not isinstance(event, str) or not event.strip():
+        raw_events = sched.get("events")
+
+        if isinstance(raw_events, list):
+            events = [e.strip() for e in raw_events if isinstance(e, str) and e.strip()]
+        else:
+            one = sched.get("event")
+            events = [one.strip()] if isinstance(one, str) and one.strip() else []
+
+        allowed = {"idle", "app_open", "app_close", "network_up", "network_down"}
+        events = [e for e in events if e in allowed]
+        events = sorted(set(events))
+        if not events:
             return {}
         
-        out = {"type": "event", "event": event.strip()}
+        out = {"type": "event", "events": events}
 
         # Idle seconds
-        if out["event"] == "idle":
+        if "idle" in events:
             try:
                 seconds = float(sched.get("seconds", 0))
             except Exception:
@@ -129,7 +139,7 @@ def _normalize_schedule(sched: dict) -> dict:
             out["seconds"] = seconds 
 
         # Apps list
-        if out["event"] in ("app_open", "app_close"):
+        if any(e in ("app_open", "app_close") for e in events):
             apps = sched.get("apps")
             if isinstance(apps, str):
                 apps_list = [a.strip() for a in apps.split(",") if a.strip()]
@@ -137,7 +147,6 @@ def _normalize_schedule(sched: dict) -> dict:
                 apps_list = [a.strip() for a in apps if isinstance(a, str) and a.strip()]
             else:
                 apps_list = []
-            
             if apps_list:
                 out["apps"] = apps_list
         

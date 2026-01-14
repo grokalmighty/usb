@@ -4,9 +4,12 @@
   "enabled": true,
   "schedule": {
     "type": "event",
-    "event": "app_close",
-    "apps": [
-      "Spotify"
+    "events": [
+      "app_open",
+      "network_down"
+    ],
+    "app": [
+      "Discord"
     ]
   },
   "entrypoint": "control_core.scripts.example.main:main"

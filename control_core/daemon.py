@@ -97,8 +97,14 @@ def main(poll_interval: float = 0.5) -> int:
                 sched = s.schedule or {}
                 if sched.get("type") != "event":
                     continue
-                if sched.get("event") != "idle":
-                    continue
+                wants = sched.get("events")
+                if isinstance(wants, list) and wants:
+                    if "idle" not in wants:
+                        continue
+                else:
+                    want = sched.get("events")
+                    if not (isinstance(want, list) and "idle" in want):
+                        continue
 
                 if idle_seconds is None:
                         continue
@@ -139,32 +145,28 @@ def main(poll_interval: float = 0.5) -> int:
                     if sched.get("type") != "event":
                         continue
 
-                    want = sched.get("event")
-
-                    if want == "app_open":
-                        if ev.get("type") != "app_open":
-                            continue
-                        apps = sched.get("apps")
-                        if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
-                            continue
-
-                    elif want == "app_close":
-                        if ev.get("type") != "app_close":
-                            continue
-                        apps = sched.get("apps")
-                        if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
-                            continue
-
-                    elif want == "network_up":
-                        if ev.get("type") != "network_up":
-                            continue
-
-                    elif want == "network_down":
-                        if ev.get("type") != "network_down":
-                            continue
-                    
+                    wants = sched.get("events")
+                    if isinstance(wants, list) and wants:
+                        want_set = set(wants)
                     else:
+                        single = sched.get("event")
+                        want_set = {single} if isinstance(single, str) else set()
+
+                    wants = sched.get("events")
+                    if not isinstance(wants, list) or not wants:
                         continue
+
+                    ev_type = ev.get("type")
+
+                    if ev_type not in wants:
+                        continue
+
+                    if ev_type in ("app_open", "app_close"):
+                        apps = sched.get("apps")
+                        if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
+                            continue
+
+                    want = ev_type
 
                     if sid in running:
                         continue

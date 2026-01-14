@@ -86,7 +86,7 @@ def due_to_run(script: Script, state: Dict[str, Any], now: float) -> Tuple[bool,
         
         # Day of month
         dom = sched.get("dom")
-        if isinstance(dom, list) and dom:
+        if isinstance(months, list) and months and isinstance(dom, list) and dom:
             try:
                 allowed_dom = {int(d) for d in dom}
                 if now_dt.day not in allowed_dom:

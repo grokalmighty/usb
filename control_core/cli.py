@@ -179,7 +179,7 @@ def main(argv=None) -> int:
                     print(f"Warning: month {m} does not have day(s) {bad_for_m}; those occurrences will be skipped.")
 
             dom = sorted(set(vals))
-            
+
         def updater(m):
             sch = {"type": "time", "at": times if len(times) > 1 else times[0], "tz": tz}
             if dows:
@@ -223,42 +223,122 @@ def main(argv=None) -> int:
         update_manifest(script_id, updater)
         print(f"Set {script_id} to run on idle >= {seconds}s")
         return 0
-
-    if cmd == "set-app-open":
-        if len(argv) < 3:
-            print("Usage: python -m control_core.cli set-app-open <id> <app1,app2, ..., | *>")
-            return 2
-        script_id = argv[1]
-        apps_raw = argv[2]
-        apps = [] if apps_raw == "*" else [a.strip() for a in apps_raw.split(",") if a.strip()]
-
-        def updater(m):
-            sch = {"type": "event", "event": "app_open"}
-            if apps:
-                sch["apps"] = apps
-            m["schedule"] = sch
-
-        update_manifest(script_id, updater)
-        print(f"Set {script_id} to run on app_open ({'any' if not apps else apps})")
-        return 0
     
-    if cmd == "set-app-close":
+    if cmd == "set-events":
         if len(argv) < 3:
-            print("Usage: python -m control_core.cli set-app-close <id> <app1,app2,... | *>")
-            return 2
+            print("Usage: python -m control_core.cli set-events <id> <event1, event2,...?"
+                  "--apps <app1,app2,...>] [--seconds <N>]")
+            print("Events: idle, app_open, app_close, network_up, network_down")
+
         script_id = argv[1]
-        apps_raw = argv[2]
-        apps = [] if apps_raw == "*" else [a.strip() for a in apps_raw.split(",") if a.strip()]
+        raw_events = argv[2]
+        events = [e.strip() for e in raw_events.split(",") if e.strip()]
 
+        allowed = {"idle", "app_open", "app_close", "network_up", "network_down"}
+        bad = [e for e in events if e not in allowed]
+        if bad:
+            print(f"Unknown event(s): {bad}. Allowed {sorted(allowed)}")
+            return 2
+        
+        # -- apps
+        apps = None
+        if "--apps" in argv:
+            i = argv.index("--apps")
+            if i + 1 >= len(argv):
+                print("Missing value after --apps")
+                return 2
+            raw_apps = argv[i + 1]
+            apps_list = [a.strip() for a in raw_apps.split(",") if a.strip()]
+            if not apps_list:
+                print("--apps must be a comma-separated list")
+                return 2
+            apps = apps_list
+
+        # --seconds (for idle)
+        seconds = None
+        if "--seconds" in argv:
+            i = argv.index("--seconds")
+            if i + 1 >= len(argv):
+                print("Missing value after --seconds")
+                return 2
+            try:
+                seconds = float(argv[i + 1])
+            except ValueError:
+                print("--seconds must be a number")
+                return 2
+            if seconds <= 0:
+                print("--seconds must be > 0")
+                return 2
+        
+        needs_apps = any(e in ("app_open", "app_close") for e in events)
+        needs_seconds = ("idle" in events)
+
+        if needs_apps and not apps:
+            print("You included app_open/app_close, so you must provide --apps <app1,app2,...>")
+            return 2
+        
+        if (not needs_apps) and apps:
+            print("You passed --apps but did not include app_open/app_close in events.")
+            print("Either remove --apps or include an app event.")
+            return 2
+
+        if needs_seconds and seconds is None:
+            print("You included idle, so you must provide --seconds <N>")
+            return 2
+
+        if (not needs_seconds) and seconds is not None:
+            print("You passed --seconds but did not include idle in events.")
+            print("Either remove --seconds or include idle.")
+            return 2
+        
         def updater(m):
-            sch = {"type": "event", "event": "app_close"}
+            sch = {"type": "event", "events": sorted(set(events))}
             if apps:
-                sch["apps"] = apps
+                sch["app"] = apps
+            if seconds is not None:
+                sch["seconds"] = seconds
             m["schedule"] = sch
-
+        
         update_manifest(script_id, updater)
-        print(f"Set {script_id} to run on app_close ({'any' if not apps else apps})")
+        print(f"Set {script_id} events={sorted(set(events))}" + 
+              (f" apps={apps}" if apps else "") +
+              (f" seconds={seconds}" if seconds is not None else ""))
         return 0
+    # if cmd == "set-app-open":
+    #     if len(argv) < 3:
+    #         print("Usage: python -m control_core.cli set-app-open <id> <app1,app2, ..., | *>")
+    #         return 2
+    #     script_id = argv[1]
+    #     apps_raw = argv[2]
+    #     apps = [] if apps_raw == "*" else [a.strip() for a in apps_raw.split(",") if a.strip()]
+
+    #     def updater(m):
+    #         sch = {"type": "event", "event": "app_open"}
+    #         if apps:
+    #             sch["apps"] = apps
+    #         m["schedule"] = sch
+
+    #     update_manifest(script_id, updater)
+    #     print(f"Set {script_id} to run on app_open ({'any' if not apps else apps})")
+    #     return 0
+    
+    # if cmd == "set-app-close":
+    #     if len(argv) < 3:
+    #         print("Usage: python -m control_core.cli set-app-close <id> <app1,app2,... | *>")
+    #         return 2
+    #     script_id = argv[1]
+    #     apps_raw = argv[2]
+    #     apps = [] if apps_raw == "*" else [a.strip() for a in apps_raw.split(",") if a.strip()]
+
+    #     def updater(m):
+    #         sch = {"type": "event", "event": "app_close"}
+    #         if apps:
+    #             sch["apps"] = apps
+    #         m["schedule"] = sch
+
+    #     update_manifest(script_id, updater)
+    #     print(f"Set {script_id} to run on app_close ({'any' if not apps else apps})")
+    #     return 0
     
     if cmd == "set-network-up":
         if len(argv) < 2:
