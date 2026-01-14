@@ -4,12 +4,14 @@
   "enabled": true,
   "schedule": {
     "type": "time",
-    "at": [
-      "11:20",
-      "11:22",
-      "11:24"
+    "at": "12:19",
+    "tz": "America/New_York",
+    "days": [
+      4
     ],
-    "tz": "America/New_York"
+    "months": [
+      1
+    ]
   },
   "entrypoint": "control_core.scripts.example.main:main"
 }

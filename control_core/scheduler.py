@@ -64,13 +64,34 @@ def due_to_run(script: Script, state: Dict[str, Any], now: float) -> Tuple[bool,
         now_dt = datetime.fromtimestamp(now, tz=tz)
         today_key = now_dt.strftime("%Y-%m-%d")
 
-        days = sched.get("days")
-        if isinstance(days, list) and days:
+        # Day of week
+        dow = sched.get("days")
+        if isinstance(dow, list) and dow:
             try:
-                allowed = {int(d) for d in days}
+                allowed = {int(d) for d in dow}
                 if now_dt.isoweekday() not in allowed:
                     return False, None
             except Exception: 
+                return False, None
+        
+        # Month
+        months = sched.get("months")
+        if isinstance(months, list) and months:
+            try:
+                allowed_months = {int(m) for m in months}
+                if now_dt.month not in allowed_months:
+                    return False, None
+            except Exception:
+                return False, None
+        
+        # Day of month
+        dom = sched.get("dom")
+        if isinstance(dom, list) and dom:
+            try:
+                allowed_dom = {int(d) for d in dom}
+                if now_dt.day not in allowed_dom:
+                    return False, None
+            except Exception:
                 return False, None
 
         # Normalize 
@@ -106,7 +127,7 @@ def due_to_run(script: Script, state: Dict[str, Any], now: float) -> Tuple[bool,
                 return True, None
             
         return False, None
-    
+
     return False, None
 
 def mark_fired(script: Script, state: Dict[str, Any], fired_at: float) -> None:

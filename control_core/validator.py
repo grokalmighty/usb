@@ -50,7 +50,7 @@ def validate_script_folder(folder: str) -> tuple[bool, list[str]]:
     
     return (len(errs) == 0), errs
 
-def validate_time(t: str) -> bool:
+def validate_times(t: str) -> bool:
     if ":" not in t:
         return False
     a = t.split(":")
@@ -59,5 +59,21 @@ def validate_time(t: str) -> bool:
     try:
         hh = int(a[0]); mm = int(a[1])
         return 0 <= hh <= 23 and 0 <= mm <= 59
+    except Exception:
+        return False
+
+def validate_dom(dom: str, m: str) -> bool:
+    try:
+        day = int(dom)
+        month = int(m)
+        if not (1 <= month <= 12):
+            return False
+        if month in (1, 3, 5, 7, 8, 10, 12):
+            return 1 <= day <= 31
+        elif month in (4, 6, 9, 11):
+            return 1 <= day <= 30
+        elif month == 2:
+            return 1 <= day <= 29
+        return False
     except Exception:
         return False

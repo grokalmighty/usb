@@ -472,3 +472,66 @@ Control Core daemon starting...(Ctrl+C to stop)
 [11:20:29] ran example ok=True run_id=ecf2f918-6c6f-431a-af76-c50f821eedec
 [11:20:34] event -> ran idle ok=True run_id=b6abb66e-0af4-4ae1-be7b-03418b1bb04e (event=idle)
 [11:22:00] ran example ok=True run_id=7af013c7-8349-482c-b7e5-7c61d78e9b6c
+[11:24:00] ran example ok=True run_id=338b75a8-32bd-48b1-952d-8759e67d1e9f
+^CDaemon exiting
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hggit add .[?2004l
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hggit commit -m "Edit set time to accept a l [Kiist to   so scripts can run 1+ times a  a day"            at 1+ time a s a day"[?2004l
+[main b5a9125] Edit set time to accept a list so scripts can run at 1+ times a day
+ 10 files changed, 132 insertions(+), 21 deletions(-)
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hggit push[?2004l
+Enumerating objects: 31, done.
+Counting objects:   3% (1/31)Counting objects:   6% (2/31)Counting objects:   9% (3/31)Counting objects:  12% (4/31)Counting objects:  16% (5/31)Counting objects:  19% (6/31)Counting objects:  22% (7/31)Counting objects:  25% (8/31)Counting objects:  29% (9/31)Counting objects:  32% (10/31)Counting objects:  35% (11/31)Counting objects:  38% (12/31)Counting objects:  41% (13/31)Counting objects:  45% (14/31)Counting objects:  48% (15/31)Counting objects:  51% (16/31)Counting objects:  54% (17/31)Counting objects:  58% (18/31)Counting objects:  61% (19/31)Counting objects:  64% (20/31)Counting objects:  67% (21/31)Counting objects:  70% (22/31)Counting objects:  74% (23/31)Counting objects:  77% (24/31)Counting objects:  80% (25/31)Counting objects:  83% (26/31)Counting objects:  87% (27/31)Counting objects:  90% (28/31)Counting objects:  93% (29/31)Counting objects:  96% (30/31)Counting objects: 100% (31/31)Counting objects: 100% (31/31), done.
+Delta compression using up to 10 threads
+Compressing objects:   5% (1/17)Compressing objects:  11% (2/17)Compressing objects:  17% (3/17)Compressing objects:  23% (4/17)Compressing objects:  29% (5/17)Compressing objects:  35% (6/17)Compressing objects:  41% (7/17)Compressing objects:  47% (8/17)Compressing objects:  52% (9/17)Compressing objects:  58% (10/17)Compressing objects:  64% (11/17)Compressing objects:  70% (12/17)Compressing objects:  76% (13/17)Compressing objects:  82% (14/17)Compressing objects:  88% (15/17)Compressing objects:  94% (16/17)Compressing objects: 100% (17/17)Compressing objects: 100% (17/17), done.
+Writing objects:   5% (1/17)Writing objects:  11% (2/17)Writing objects:  17% (3/17)Writing objects:  23% (4/17)Writing objects:  29% (5/17)Writing objects:  35% (6/17)Writing objects:  41% (7/17)Writing objects:  47% (8/17)Writing objects:  52% (9/17)Writing objects:  58% (10/17)Writing objects:  64% (11/17)Writing objects:  70% (12/17)Writing objects:  76% (13/17)Writing objects:  82% (14/17)Writing objects:  88% (15/17)Writing objects:  94% (16/17)Writing objects: 100% (17/17)Writing objects: 100% (17/17), 16.38 KiB | 5.46 MiB/s, done.
+Total 17 (delta 11), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas:   0% (0/11)[Kremote: Resolving deltas:   9% (1/11)[Kremote: Resolving deltas:  18% (2/11)[Kremote: Resolving deltas:  27% (3/11)[Kremote: Resolving deltas:  36% (4/11)[Kremote: Resolving deltas:  45% (5/11)[Kremote: Resolving deltas:  54% (6/11)[Kremote: Resolving deltas:  63% (7/11)[Kremote: Resolving deltas:  72% (8/11)[Kremote: Resolving deltas:  81% (9/11)[Kremote: Resolving deltas:  90% (10/11)[Kremote: Resolving deltas: 100% (11/11)[Kremote: Resolving deltas: 100% (11/11), completed with 11 local objects.[K
+To github.com:grokalmighty/usb.git
+   b34c2d2..b5a9125  main -> main
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hgit pushcommit -m "Edit set time to accept a list so scripts can run at 1+ times a day"[K[A[1Cadd .[K[1B[K[A[47C[9Dpython -m control_core.daemon[?2004l[1BControl Core daemon starting...(Ctrl+C to stop)
+[11:30:48] event -> ran idle ok=True run_id=6b5f454f-2c65-4504-800d-1335881409af (event=idle)
+[11:31:00] ran example ok=True run_id=253da7c9-0ada-4840-8ff5-bfca7c334c57
+^CDaemon exiting
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hpython -m control_core.daemon[?2004l
+Control Core daemon starting...(Ctrl+C to stop)
+[11:32:48] event -> ran idle ok=True run_id=3c51ceb2-3932-409d-96fd-a90b71a63bc4 (event=idle)
+[11:33:00] ran example ok=True run_id=18c43a0c-8ef5-49f5-871b-8a13b52f2508
+^CDaemon exiting
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hpython -m control_core.daemon[?2004l
+Control Core daemon starting...(Ctrl+C to stop)
+Traceback (most recent call last):
+  File [35m"<frozen runpy>"[0m, line [35m198[0m, in [35m_run_module_as_main[0m
+  File [35m"<frozen runpy>"[0m, line [35m88[0m, in [35m_run_code[0m
+  File [35m"/Users/jas/projects/usb/control_core/daemon.py"[0m, line [35m343[0m, in [35m<module>[0m
+    code = main()
+  File [35m"/Users/jas/projects/usb/control_core/daemon.py"[0m, line [35m61[0m, in [35mmain[0m
+    scripts = discover_scripts()
+  File [35m"/Users/jas/projects/usb/control_core/registry.py"[0m, line [35m196[0m, in [35mdiscover_scripts[0m
+    schedule=[31m_normalize_schedule[0m[1;31m(data.get("schedule", {}))[0m,
+             [31m~~~~~~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"/Users/jas/projects/usb/control_core/registry.py"[0m, line [35m84[0m, in [35m_normalize_schedule[0m
+    [1;31mout[0m["days"] = days
+    [1;31m^^^[0m
+[1;35mUnboundLocalError[0m: [35mcannot access local variable 'out' where it is not associated with a value[0m
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hpython -m control_core.daemon[?2004l
+Control Core daemon starting...(Ctrl+C to stop)
+Traceback (most recent call last):
+  File [35m"<frozen runpy>"[0m, line [35m198[0m, in [35m_run_module_as_main[0m
+  File [35m"<frozen runpy>"[0m, line [35m88[0m, in [35m_run_code[0m
+  File [35m"/Users/jas/projects/usb/control_core/daemon.py"[0m, line [35m343[0m, in [35m<module>[0m
+    code = main()
+  File [35m"/Users/jas/projects/usb/control_core/daemon.py"[0m, line [35m61[0m, in [35mmain[0m
+    scripts = discover_scripts()
+  File [35m"/Users/jas/projects/usb/control_core/registry.py"[0m, line [35m198[0m, in [35mdiscover_scripts[0m
+    schedule=[31m_normalize_schedule[0m[1;31m(data.get("schedule", {}))[0m,
+             [31m~~~~~~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"/Users/jas/projects/usb/control_core/registry.py"[0m, line [35m84[0m, in [35m_normalize_schedule[0m
+    [1;31mout[0m["days"] = days
+    [1;31m^^^[0m
+[1;35mUnboundLocalError[0m: [35mcannot access local variable 'out' where it is not associated with a value[0m
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004hpython -m control_core.daemon[?2004l
+Control Core daemon starting...(Ctrl+C to stop)
+[12:17:18] ran example ok=True run_id=cc4ade2a-9c1f-4bc3-8ee1-8e8b389724cf
+[12:17:49] event -> ran idle ok=True run_id=56c5ebea-a284-4b1d-a75f-f9f0312328da (event=idle)
+^CDaemon exiting
+[1m[7m%[27m[1m[0m                                                                                ]7;file://Jasmines-MacBook-Pro.local/Users/jas/projects/usb[0m[27m[24m[J(base) jas@Jasmines-MacBook-Pro usb % [K[?2004h

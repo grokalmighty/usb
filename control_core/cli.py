@@ -5,7 +5,7 @@ from .registry import discover_scripts, list_scripts, update_manifest
 from .runner import run_script
 from .installer import install_script_from_folder
 from .logs import last_run_by_script, tail_follow
-from .validator import validate_script_folder, validate_time
+from .validator import validate_script_folder, validate_times, validate_dom
 from .daemon_state import read_pid, pid_is_running, PID_PATH, LOCKS_DIR
 from .stats import compute_stats
 from .history import get_history, format_event
@@ -106,40 +106,91 @@ def main(argv=None) -> int:
                 return 2
             tz = argv[i + 1]
 
-        bad = [t for t in times if not validate_time(t)]
-        if bad:
-            print(f"Invalid itmes(s): {bad}. Use HH:MM (24-hour).")
+        bad_times = [t for t in times if not validate_times(t)]
+        if bad_times:
+            print(f"Invalid itmes(s): {bad_times}. Use HH:MM (24-hour).")
             return 2
         
-        def updater(m):
-            m["schedule"] = {"type": "time", "at": times, "tz": tz}
-
-        update_manifest(script_id, updater)
-        print(f"Set {script_id} daily time(s) to {times} ({tz})")
-        return 0
-    
-    if cmd == "set-time-weekdays":
-        if len(argv) < 3:
-            print("Usage: python -m control_core.cli set-time-weekdays <id> <HH:MM> [--tz <IANA_TZ>]")
-            return 2
-        
-        script_id = argv[1]
-        at = argv[2]
-
-        tz = "America/New_York"
-        if "--tz" in argv:
-            i = argv.index("--tz")
+        # Day of the week
+        dows = None
+        if "--dow" in argv:
+            i = argv.index("--dow")
             if i + 1 >= len(argv):
-                print("Missing value after --tz")
+                print('Missing value after --dow')
                 return 2
-            tz = argv[i + 1]
+            raw_dow = argv[i + 1]
+            try:
+                vals = [int(x.strip()) for x in raw_dow.split(",") if x.strip()]
+            except Exception:
+                print('--dow must be comma-separated integers 1-7 (1=Mon,7=Sun)')
+                return 2
+            bad = [d for d in vals if d < 1 or d > 7]
+            if bad or not vals:
+                print('--dow must be comma-separated integers 1-7 (1=Mon,7=Sun)')
+                return 2
+            dows = sorted(set(vals))
+        
+        # Month
+        months = None
+        if "--month" in argv:
+            i = argv.index("--month")
+            if i + 1 >= len(argv):
+                print('Missing value after --month')
+                return 2
+            raw_month = argv[i + 1]
+            try:
+                vals = [int(x.strip()) for x in raw_month.split(",") if x.strip()]
+            except Exception:
+                print('--month must be comma-separated integers 1-12')
+                return 2
+            bad = [m for m in vals if m < 1 or m > 12]
+            if bad or not vals:
+                print('--month must be comma-separated integers 1-12')
+                return 2
+            months = sorted(set(vals))
+
+        # Day of the month
+        dom = None
+        if "--dom" in argv:
+            i = argv.index("--dom")
+            if i + 1 >= len(argv):
+                print('Missing value after --dom')
+                return 2
+            raw_dom = argv[i + 1]
+            try:
+                vals = [int(x.strip()) for x in raw_dom.split(",") if x.strip()]
+            except Exception:
+                print('--dom must be comma-separated integers 1-31')
+                return 2
+            
+            bad = [d for d in vals if not validate_dom(d, m)]
+            if bad or not vals:
+                print('--dom must be comma-separted integers 1-31')
+                return 2
+            dom = sorted(set(vals)) 
         
         def updater(m):
-            m["schedule"] = {"type": "time", "at": at, "tz": tz, "days": [1,2,3,4,5]}
-        
+            sch = {"type": "time", "at": times if len(times) > 1 else times[0], "tz": tz}
+            if dows:
+                sch["days"] = dows
+            if months:
+                sch["months"] = months
+            if dom:
+                sch["dom"] = dom
+            m["schedule"] = sch
+
         update_manifest(script_id, updater)
-        print(f"Set {script_id} time to {at} on weekdays (Mon-Fri) ({tz})")
-        return 0 
+
+        extra = []
+        if dows:
+            extra.append(f"dow={dows}")
+        if months:
+            extra.append(f"months={months}")
+        if dom:
+            extra.append(f"dom={dom}")
+        suffix = (" " + " ".join(extra)) if extra else ""
+        print(f"Set {script_id} time(s) to {times} ({tz}){suffix}")
+        return 0
 
     if cmd == "set-idle":
         if len(argv) < 3:
@@ -183,6 +234,7 @@ def main(argv=None) -> int:
     if cmd == "set-app-close":
         if len(argv) < 3:
             print("Usage: python -m control_core.cli set-app-close <id> <app1,app2,... | *>")
+            return 2
         script_id = argv[1]
         apps_raw = argv[2]
         apps = [] if apps_raw == "*" else [a.strip() for a in apps_raw.split(",") if a.strip()]

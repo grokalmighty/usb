@@ -69,6 +69,7 @@ def _normalize_schedule(sched: dict) -> dict:
         
         tz = sched.get("tz") or "America/New_York"
 
+        # Days of the week
         days = sched.get("days")
         if isinstance(days, list) and days:
             try:
@@ -79,9 +80,35 @@ def _normalize_schedule(sched: dict) -> dict:
         else:
             days = None
         
+        # Month
+        months = sched.get("months")
+        if isinstance(months, list) and months:
+            try:
+                months = [int(m) for m in months]
+                months = [m for m in months if 1 <= m <= 12]
+            except Exception:
+                months = None
+        else:
+            months = None
+
+        # Days of the month
+        dom = sched.get("dom")
+        if isinstance(dom, list) and dom:
+            try:
+                dom = [int(d) for d in dom]
+                dom = [d for d in dom if 1 <= d <= 31]
+            except Exception:
+                dom = None
+        else:
+            dom = None
+
         out = {"type": "time", "at": norm_times if len(norm_times) > 1 else norm_times[0], "tz": tz}
         if days:
             out["days"] = days
+        if months:
+            out["months"] = months
+        if dom:
+            out["dom"] = dom
         return out 
     
     if stype == "event":
