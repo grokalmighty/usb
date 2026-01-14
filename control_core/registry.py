@@ -102,7 +102,7 @@ def _normalize_schedule(sched: dict) -> dict:
             out["seconds"] = seconds 
 
         # Apps list
-        if out["event"] == ("app_open", "app_close"):
+        if out["event"] in ("app_open", "app_close"):
             apps = sched.get("apps")
             if isinstance(apps, str):
                 apps_list = [a.strip() for a in apps.split(",") if a.strip()]
@@ -120,7 +120,10 @@ def _normalize_schedule(sched: dict) -> dict:
         p = sched.get("path")
         if not p:
             return {}
-        poll_seconds = float(sched.get("poll_seconds", 1.0) or 1.0)
+        try:
+            poll_seconds = float(sched.get("poll_seconds", 1.0) or 1.0)
+        except Exception:
+            poll_seconds = 1.0
         return {"type": "file_watch", "path": p, "poll_seconds": poll_seconds}
     
     if stype == "on_failure":

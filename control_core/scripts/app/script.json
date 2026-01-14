@@ -6,7 +6,7 @@
     "type": "event",
     "event": "app_open",
     "apps": [
-      "Code"
+      "Electron"
     ]
   },
   "entrypoint": "control_core.scripts.app.main:main"

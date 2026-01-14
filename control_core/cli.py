@@ -168,7 +168,7 @@ def main(argv=None) -> int:
 
     if cmd == "set-app-open":
         if len(argv) < 3:
-            print("Usage: python -m control_core.cli set-app-open <id> <app1, app2, ..., | *>")
+            print("Usage: python -m control_core.cli set-app-open <id> <app1,app2, ..., | *>")
             return 2
         script_id = argv[1]
         apps_raw = argv[2]

@@ -16,6 +16,27 @@ def is_process_running_exact(name: str) -> bool:
         return False
     except Exception:
         return False
+
+def list_running_apps_macos() -> Set[str]:
+    """
+    Returns a set of GUI app process names
+    """
+
+    try:
+        out = subprocess.check_output(
+            ["osascript", "-e", 'tell application "System Events" to get name of processes'],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+
+        apps = set()
+        for part in out.split(","):
+            name = part.strip()
+            if name:
+                apps.add(name)
+        return apps
+    except Exception:
+        return set()
     
 def get_idle_seconds_macos() -> Optional[float]:
     """

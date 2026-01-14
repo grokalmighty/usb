@@ -9,7 +9,7 @@ from .runner import run_script
 from .daemon_state import write_pid, clear_pid
 from .scheduler_state import load_state, save_state
 from .scheduler import due_to_run, mark_fired
-from .events import get_idle_seconds_macos, list_process_names, get_local_ip, match_apps, is_process_running_exact
+from .events import get_idle_seconds_macos, list_process_names, get_local_ip, match_apps, is_process_running_exact, list_running_apps_macos
 
 LOG_PATH = Path(__file__).resolve().parent.parent / "data" / "logs.jsonl"
 
@@ -50,89 +50,80 @@ def main(poll_interval: float = 0.5) -> int:
 
         # Event detector state
         last_idle_mode = "active"
-        last_proc_names = list_process_names()
         last_ip = get_local_ip()
         last_net_up = last_ip is not None
         last_net_change_ts = 0.0
-        last_app_event: dict[tuple[str, str], float] = {}
-        app_state: Dict[str, bool] = {}
+        last_apps = list_running_apps_macos()
+        idle_fired: Dict[str, bool] = {}
+        event_cooldown: Dict[str, float] = {}
+        
         while not stop_flag["stop"]:
             now = time.time()
             scripts = discover_scripts()
             events = []
-
-            # Collect watched apps from enabled scripts
-            watched_open = set()
-            watched_close = set()
-
-            for sid, s in scripts.items():
-                if not s.enabled:
-                    continue
-                sched = s.schedule or {}
-                if sched.get("type") == "event" and sched.get("event") == "app_open":
-                    apps = sched.get("apps")
-                    if isinstance(apps, list) and apps:
-                        watched_open.update(apps)
-                if sched.get("tyoe") == "event" and sched.get("event") == "app_close":
-                    apps = sched.get("apps")
-                    if isinstance(apps, list) and apps:
-                        watched_close.update(apps)
-            
-            watched = watched_open | watched_close
-
-            # Emit events only on state transitions
-            for app in watched:
-                cur_running = is_process_running_exact(app)
-                prev_running = app_state.get(app)
-
-                if prev_running is None:
-                    app_state[app] = cur_running
-                    continue
-
-                if not prev_running and cur_running:
-                    events.append({"type": "app_open", "app": app})
-                elif prev_running and not cur_running:
-                    events.append({"type": "app_close", "app": app})
-
-                app_state[app] = cur_running
                 
             # Idle detection
             idle_seconds = get_idle_seconds_macos()
 
-            if idle_seconds is not None:
-                idle_thresholds = []
-                for sid, s in scripts.items():
-                    if not s.enabled:
-                        continue
-                    sched = s.schedule or {}
-                    if sched.get("type") == "event" and sched.get("event") == "idle":
-                        try:
-                            idle_thresholds.append(float(sched.get("seconds", 0)))
-                        except Exception:
-                            pass
-                
-                if idle_thresholds:
-                    mode = "idle" if idle_seconds >= min(idle_thresholds) else "active"
-                    if mode != last_idle_mode:
-                        last_idle_mode = mode
-                        events.append({"type": "idle_state", "mode": mode, "idle_seconds": idle_seconds})
+            if idle_seconds is not None and idle_seconds < 1.0:
+                idle_fired.clear()
 
             # App open/close 
-            cur = list_process_names()
-            opened = sorted(cur - last_proc_names)
-            closed = sorted(last_proc_names - cur)
-            last_proc_names = cur
-            
+            cur_apps = list_running_apps_macos()
+            opened = sorted(cur_apps - last_apps)
+            closed = sorted(last_apps - cur_apps)
+            last_apps = cur_apps
+
             for name in opened:
-                k = ("open", name)
-                if now - last_app_event.get(k, 0.0) < 2.0:
-                    continue
-                last_app_event[k] = now
                 events.append({"type": "app_open", "app": name})
             for name in closed:
                 events.append({"type": "app_close", "app": name})
             
-            # Dispatch
+            # Network up/down
+            ip = get_local_ip()
+            net_up = ip is not None
+            if net_up != last_net_up:
+                if now - last_net_change_ts >= 2.0:
+                    last_net_change_ts = now
+                    last_net_up = net_up
+                    if net_up:
+                        events.append({"type": "network_up", "ip": ip})
+                    else:
+                        events.append({"type": "network_down"})
+            
+            # Dispatch idle
+            for sid, s in scripts.items():
+                if not s.enabled:
+                    continue
+                sched = s.schedule or {}
+                if sched.get("type") != "event":
+                    continue
+                if sched.get("event") != "idle":
+                    continue
+
+                if idle_seconds is None:
+                        continue
+                try:
+                    threshold = float(sched.get("seconds", 0))
+                except Exception:
+                    continue
+                if idle_seconds < threshold:
+                    continue
+                if idle_fired.get(sid):
+                    continue
+                idle_fired[sid] = True
+                running.add(sid)
+                try:
+                    ok, run_id = run_script(
+                        s,
+                        timeout_seconds=20.0,
+                        payload={"event": {"type": "idle", "idle_seconds": idle_seconds}, "trigger": "event"},
+                    )
+                    print(f"[{time.strftime('%H:%M:%S')}] event -> ran {sid} ok={ok} run_id={run_id} (event=idle)")
+                finally:
+                    running.remove(sid)
+
+            # Dispatch other discrete events
             for ev in events:
                 for sid, s in scripts.items():
                     if not s.enabled:
@@ -142,31 +133,20 @@ def main(poll_interval: float = 0.5) -> int:
                         continue
 
                     want = sched.get("event")
-                    if want == "idle":
-                        if ev.get("type") != "idle_state" or ev.get("mode") != "idle":
-                            continue
-                        try:
-                            threshold = float(sched.get("seconds", 0))
-                        except Exception:
-                            continue
-                        if float(ev.get("idle_seconds", 0)) < threshold:
-                            continue
 
-                    elif want == "app_open":
+                    if want == "app_open":
                         if ev.get("type") != "app_open":
                             continue
                         apps = sched.get("apps")
-                        if isinstance(apps, list) and apps:
-                            if ev.get("app") not in apps:
-                                continue
+                        if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
+                            continue
 
                     elif want == "app_close":
                         if ev.get("type") != "app_close":
                             continue
                         apps = sched.get("apps")
-                        if isinstance(apps, list) and apps:
-                            if ev.get("app") not in apps:
-                                continue
+                        if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
+                            continue
 
                     elif want == "network_up":
                         if ev.get("type") != "network_up":
@@ -191,18 +171,6 @@ def main(poll_interval: float = 0.5) -> int:
                         print(f"[{time.strftime('%H:%M:%S')}] event -> ran {sid} ok={ok} run_id={run_id} (event={want})")
                     finally:
                         running.remove(sid)
-
-            # Network
-            ip = get_local_ip()
-            net_up = ip is not None
-            if net_up != last_net_up:
-                if now - last_net_change_ts >= 2.0:
-                    last_net_change_ts = now
-                    last_net_up = net_up
-                    if net_up:
-                        events.append({"type": "network_up", "ip": ip})
-                    else:
-                        events.append({"type": "network_down"})
                         
             # Purge state for disabled/missing scripts
             enabled_ids = {sid for sid, s in scripts.items() if s.enabled}
@@ -306,7 +274,7 @@ def main(poll_interval: float = 0.5) -> int:
                         ok, run_id = run_script(
                             s,
                             timeout_seconds=20.0,
-                            payload={"scheduled": True, "trigger": "interval"},
+                            payload={"scheduled": True, "trigger": stype},
                         )
                         print(f"[{time.strftime('%H:%M:%S')}] ran {sid} ok={ok} run_id={run_id}")
                     finally:
