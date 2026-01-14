@@ -64,7 +64,9 @@ def main(poll_interval: float = 0.5) -> int:
             # Idle detection
             idle_seconds = get_idle_seconds_macos()
 
-            if idle_seconds is not None and idle_seconds < 1.0:
+            IDLE_RESET_SECONDS = 3.0
+
+            if idle_seconds is not None and idle_seconds < IDLE_RESET_SECONDS:
                 idle_fired.clear()
 
             # App open/close 
