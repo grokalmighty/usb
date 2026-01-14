@@ -163,12 +163,23 @@ def main(argv=None) -> int:
                 print('--dom must be comma-separated integers 1-31')
                 return 2
             
-            bad = [d for d in vals if not validate_dom(d, m)]
-            if bad or not vals:
-                print('--dom must be comma-separted integers 1-31')
+            # --dom requires --month
+            if months is None:
+                print("--dom requires --month")
                 return 2
-            dom = sorted(set(vals)) 
-        
+            
+            bad = [d for d in vals if not any(validate_dom(d, m) for m in months)]
+            if bad or not vals:
+                print(f"--dom contains day(s) not valid for any selected month(s): {bad}")
+                return 2
+            
+            for m in months:
+                bad_for_m = [d for d in vals if not validate_dom(d, m)]
+                if bad_for_m:
+                    print(f"Warning: month {m} does not have day(s) {bad_for_m}; those occurrences will be skipped.")
+
+            dom = sorted(set(vals))
+            
         def updater(m):
             sch = {"type": "time", "at": times if len(times) > 1 else times[0], "tz": tz}
             if dows:

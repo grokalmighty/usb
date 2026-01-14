@@ -35,7 +35,7 @@ def validate_script_folder(folder: str) -> tuple[bool, list[str]]:
     sched = data.get("schedule", {})
     if sched:
         stype = sched.get("type")
-        if stype not in ("interval", "file_watch", "on_failure"):
+        if stype not in ("interval", "time", "event", "file_watch", "on_failure"):
             errs.append(f"Unknown schedule type: {stype}")
 
     # Recommended files
@@ -62,7 +62,7 @@ def validate_times(t: str) -> bool:
     except Exception:
         return False
 
-def validate_dom(dom: str, m: str) -> bool:
+def validate_dom(dom: int, m: int) -> bool:
     try:
         day = int(dom)
         month = int(m)

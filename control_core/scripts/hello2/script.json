@@ -4,14 +4,14 @@
   "enabled": true,
   "schedule": {
     "type": "time",
-    "at": ["17:10", "17:12"],
+    "at": "17:40",
     "tz": "America/New_York",
-    "days": [
+    "months": [
       1,
-      2,
-      3,
-      4,
-      5
+      2
+    ],
+    "dom": [
+      31
     ]
   },
   "entrypoint": "control_core.scripts.hello2.main:main",

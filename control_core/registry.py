@@ -93,7 +93,7 @@ def _normalize_schedule(sched: dict) -> dict:
 
         # Days of the month
         dom = sched.get("dom")
-        if isinstance(dom, list) and dom:
+        if (isinstance(dom, list) and dom) and months:
             try:
                 dom = [int(d) for d in dom]
                 dom = [d for d in dom if 1 <= d <= 31]

@@ -3,14 +3,10 @@
   "name": "Example Script",
   "enabled": true,
   "schedule": {
-    "type": "time",
-    "at": "12:19",
-    "tz": "America/New_York",
-    "days": [
-      4
-    ],
-    "months": [
-      1
+    "type": "event",
+    "event": "app_close",
+    "apps": [
+      "Spotify"
     ]
   },
   "entrypoint": "control_core.scripts.example.main:main"
