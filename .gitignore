@@ -1,0 +1,5 @@
+# ---- Control Core runtime data ----
+
+# But keep the folder(s) in git (requires a placeholder file like .gitkeep)
+!control_core/data/.gitkeep
+!data/.gitkeep

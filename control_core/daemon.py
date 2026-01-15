@@ -49,7 +49,6 @@ def main(poll_interval: float = 0.5) -> int:
     try:
 
         # Event detector state
-        last_idle_mode = "active"
         last_ip = get_local_ip()
         last_net_up = last_ip is not None
         last_net_change_ts = 0.0
@@ -81,7 +80,7 @@ def main(poll_interval: float = 0.5) -> int:
             # App open/close 
             if now >= next_app_poll:
                 next_app_poll = now + APP_POLL_SECONDS
-                
+
                 cur_apps = list_running_apps_macos()
                 opened = sorted(cur_apps - last_apps)
                 closed = sorted(last_apps - cur_apps)
