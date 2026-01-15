@@ -4,27 +4,14 @@ import time
 import socket
 from typing import Optional, Set, Dict, Any, List
 
-def is_process_running_exact(name: str) -> bool:
-    """
-    True if a process with exact name exists.
-    """
-
-    try:
-        subprocess.check_output(["pgrep", "-x", name], stderr=subprocess.DEVNULL)
-        return True
-    except subprocess.CalledProcessError:
-        return False
-    except Exception:
-        return False
-
-def list_running_apps_macos() -> Set[str]:
+def list_running_apps_macos() -> set[str]:
     """
     Returns a set of GUI app process names
     """
 
     try:
         out = subprocess.check_output(
-            ["osascript", "-e", 'tell application "System Events" to get name of processes'],
+            ["osascript", "-e", 'tell application "System Events" to get name of application processes'],
             text=True,
             stderr=subprocess.DEVNULL,
         )
@@ -59,21 +46,6 @@ def get_idle_seconds_macos() -> Optional[float]:
         return None
     except Exception:
         return None
-
-def list_process_names() -> Set[str]:
-    try:
-        out = subprocess.check_output(["ps", "-axo", "comm="], text=True)
-        names: Set[str] = set()
-        for line in out.splitlines():
-            name = line.strip()
-            if not name:
-                continue
-            
-            name = name.split("/")[-1]
-            names.add(name)
-        return names
-    except Exception:
-        return set()
     
 def get_local_ip() -> Optional[str]:
     """
@@ -100,3 +72,11 @@ def match_apps(event_apps: Optional[List[str]], opened_or_closed: str) -> bool:
     if not event_apps:
         return True
     return opened_or_closed in set(event_apps)
+
+def normalize_app_name(name: str) -> str:
+    n = (name or "").strip()
+
+    for suf in ("Helper", " Helper (Renderer)", " Helper (GPU)", " Helper (Plugin)", " Helper (Alerts)"):
+        if n.endswith(suf):
+            n = n[: -len(suf)]
+    return n

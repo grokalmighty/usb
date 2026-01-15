@@ -9,7 +9,7 @@ from .runner import run_script
 from .daemon_state import write_pid, clear_pid
 from .scheduler_state import load_state, save_state
 from .scheduler import due_to_run, mark_fired
-from .events import get_idle_seconds_macos, list_process_names, get_local_ip, match_apps, is_process_running_exact, list_running_apps_macos
+from .events import get_idle_seconds_macos, get_local_ip, match_apps, list_running_apps_macos, normalize_app_name
 
 LOG_PATH = Path(__file__).resolve().parent.parent / "data" / "logs.jsonl"
 
@@ -58,11 +58,15 @@ def main(poll_interval: float = 0.5) -> int:
 
         IDLE_RESET_SECONDS = 3.0
 
-        event_seen: Dict[tuple[str, str], float] = {}
-        EVENT_DEBOUNCE_SECONDS = 2.0
-
         event_cooldown: Dict[tuple[str, str], float] = {}
         EVENT_SCRIPT_COOLDOWN_SECONDS = 2.0
+
+        app_event_cooldown: dict[tuple[str, str], float] = {}
+        APP_EVENT_COOLDOWN_SECONDS = 5.0
+
+        APP_POLL_SECONDS = 1.5
+        next_app_poll = 0.0
+
         while not stop_flag["stop"]:
             now = time.time()
             scripts = discover_scripts()
@@ -75,24 +79,27 @@ def main(poll_interval: float = 0.5) -> int:
                 idle_fired.clear()
 
             # App open/close 
-            cur_apps = list_running_apps_macos()
-            opened = sorted(cur_apps - last_apps)
-            closed = sorted(last_apps - cur_apps)
-            last_apps = cur_apps
+            if now >= next_app_poll:
+                next_app_poll = now + APP_POLL_SECONDS
+                
+                cur_apps = list_running_apps_macos()
+                opened = sorted(cur_apps - last_apps)
+                closed = sorted(last_apps - cur_apps)
+                last_apps = cur_apps
 
             for name in opened:
                 k = ("app_open", name)
-                last = event_seen.get(k, 0.0)
-                if now - last >= EVENT_DEBOUNCE_SECONDS:
-                    event_seen[k] = now
-                    events.append({"type": "app_open", "app": name})
+                last = app_event_cooldown.get(k, 0.0)
+                if now - last >= APP_EVENT_COOLDOWN_SECONDS
+                    app_event_cooldown[k] = now
+                    events.append({"type": "app_open", "app": normalize_app_name(name)})
             
             for name in closed:
                 k = ("app_close", name)
-                last = event_seen.get(k, 0.0)
-                if now - last >= EVENT_DEBOUNCE_SECONDS:
-                    event_seen[k] = now
-                    events.append({"type": "app_close", "app": name})
+                last = app_event_cooldown.get(k, 0.0)
+                if now - last >= APP_EVENT_COOLDOWN_SECONDS:
+                    app_event_cooldown[k] = now
+                    events.append({"type": "app_close", "app": normalize_app_name(name)})
             
             # Network up/down
             ip = get_local_ip()
@@ -161,7 +168,7 @@ def main(poll_interval: float = 0.5) -> int:
                     if sched.get("type") != "event":
                         continue
 
-                    want = sched.get("events")
+                    wants = sched.get("events")
                     if not (isinstance(wants, list) and wants):
                         continue
 
@@ -175,7 +182,7 @@ def main(poll_interval: float = 0.5) -> int:
                         continue
 
                     # App filtering 
-                    if ev_type in ("app_open", "app_close, network_up, network_down"):
+                    if ev_type in ("app_open", "app_close"):
                         apps = sched.get("apps")
                         if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
                             continue
