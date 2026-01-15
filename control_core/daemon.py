@@ -55,9 +55,14 @@ def main(poll_interval: float = 0.5) -> int:
         last_net_change_ts = 0.0
         last_apps = list_running_apps_macos()
         idle_fired: Dict[str, bool] = {}
-        event_cooldown: Dict[str, float] = {}
+
+        IDLE_RESET_SECONDS = 3.0
+
         event_seen: Dict[tuple[str, str], float] = {}
         EVENT_DEBOUNCE_SECONDS = 2.0
+
+        event_cooldown: Dict[tuple[str, str], float] = {}
+        EVENT_SCRIPT_COOLDOWN_SECONDS = 2.0
         while not stop_flag["stop"]:
             now = time.time()
             scripts = discover_scripts()
@@ -65,8 +70,6 @@ def main(poll_interval: float = 0.5) -> int:
                 
             # Idle detection
             idle_seconds = get_idle_seconds_macos()
-
-            IDLE_RESET_SECONDS = 3.0
 
             if idle_seconds is not None and idle_seconds < IDLE_RESET_SECONDS:
                 idle_fired.clear()
@@ -110,14 +113,8 @@ def main(poll_interval: float = 0.5) -> int:
                 sched = s.schedule or {}
                 if sched.get("type") != "event":
                     continue
-                wants = sched.get("events")
-                if isinstance(wants, list) and wants:
-                    if "idle" not in wants:
-                        continue
-                else:
-                    want = sched.get("events")
-                    if not (isinstance(want, list) and "idle" in want):
-                        continue
+                if sched.get("event") != "idle":
+                    continue
 
                 if idle_seconds is None:
                         continue
@@ -129,7 +126,11 @@ def main(poll_interval: float = 0.5) -> int:
                     continue
                 if idle_fired.get(sid):
                     continue
+
                 idle_fired[sid] = True
+                if sid in running:
+                    continue
+            
                 running.add(sid)
                 try:
                     ok, run_id = run_script(
@@ -143,46 +144,38 @@ def main(poll_interval: float = 0.5) -> int:
 
             # Dispatch other discrete events
             for ev in events:
+                ev_type = ev.get("type")
+                if not isinstance(ev_type, str):
+                    continue
+
                 for sid, s in scripts.items():
-
-                    # Prevent scripts from rapidly firing
-                    cooldown = 3.0
-                    last = event_cooldown.get(sid, 0.0)
-                    if now - last < cooldown:
-                        continue
-                    event_cooldown[sid] = now
-
                     if not s.enabled:
                         continue
+
                     sched = s.schedule or {}
                     if sched.get("type") != "event":
                         continue
 
-                    wants = sched.get("events")
-                    if isinstance(wants, list) and wants:
-                        want_set = set(wants)
-                    else:
-                        single = sched.get("event")
-                        want_set = {single} if isinstance(single, str) else set()
-
-                    wants = sched.get("events")
-                    if not isinstance(wants, list) or not wants:
+                    want = sched.get("events")
+                    if want != ev_type:
+                        continue
+                    
+                    # Script cooldown per (sid, want)
+                    ck = (sid, want)
+                    last = event_cooldown.get(ck, 0.0)
+                    if now - last < EVENT_SCRIPT_COOLDOWN_SECONDS:
                         continue
 
-                    ev_type = ev.get("type")
-
-                    if ev_type not in wants:
-                        continue
-
-                    if ev_type in ("app_open", "app_close"):
+                    # App filtering 
+                    if want in ("app_open", "app_close"):
                         apps = sched.get("apps")
                         if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
                             continue
-
-                    want = ev_type
-
+                    
                     if sid in running:
                         continue
+
+                    event_cooldown[ck] = now
                     running.add(sid)
                     try:
                         ok, run_id = run_script(
@@ -271,7 +264,7 @@ def main(poll_interval: float = 0.5) -> int:
                             running.remove(sid)
 
             any_sched_change = False
-                    
+
             # Run due scripts
             for sid, s in scripts.items():
                 if not s.enabled:
