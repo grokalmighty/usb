@@ -113,9 +113,14 @@ def main(poll_interval: float = 0.5) -> int:
                 sched = s.schedule or {}
                 if sched.get("type") != "event":
                     continue
-                if sched.get("event") != "idle":
+
+                wants = sched.get("events")
+                if not (isinstance(wants, list) and wants):
                     continue
 
+                if "idle" not in wants:
+                    continue
+                
                 if idle_seconds is None:
                         continue
                 try:
@@ -157,17 +162,20 @@ def main(poll_interval: float = 0.5) -> int:
                         continue
 
                     want = sched.get("events")
-                    if want != ev_type:
+                    if not (isinstance(wants, list) and wants):
+                        continue
+
+                    if ev_type not in wants:
                         continue
                     
                     # Script cooldown per (sid, want)
-                    ck = (sid, want)
+                    ck = (sid, ev_type)
                     last = event_cooldown.get(ck, 0.0)
                     if now - last < EVENT_SCRIPT_COOLDOWN_SECONDS:
                         continue
 
                     # App filtering 
-                    if want in ("app_open", "app_close"):
+                    if ev_type in ("app_open", "app_close, network_up, network_down"):
                         apps = sched.get("apps")
                         if not match_apps(apps if isinstance(apps, list) else None, ev.get("app", "")):
                             continue
@@ -183,7 +191,7 @@ def main(poll_interval: float = 0.5) -> int:
                             timeout_seconds=20.0,
                             payload={"event": ev, "trigger": "event"},
                         )
-                        print(f"[{time.strftime('%H:%M:%S')}] event -> ran {sid} ok={ok} run_id={run_id} (event={want})")
+                        print(f"[{time.strftime('%H:%M:%S')}] event -> ran {sid} ok={ok} run_id={run_id} (event={ev_type})")
                     finally:
                         running.remove(sid)
                         

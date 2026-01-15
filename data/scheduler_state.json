@@ -1,11 +1,4 @@
 {
-  "hello2": {
-    "last_fired_day": "2026-01-12",
-    "fired_times": [
-      "17:10",
-      "17:12"
-    ]
-  },
   "example": {
     "last_fired_at": 1768406782.1843042,
     "last_fired_day": "2026-01-14",
